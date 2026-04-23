@@ -205,3 +205,29 @@ CREATE POLICY "contact_messages_service_all" ON public.contact_messages
 -- Replace the email below with the actual admin email
 -- ============================================================================
 -- UPDATE public.profiles SET role = 'admin' WHERE email = 'admin@example.com';
+
+-- ============================================================================
+-- STORAGE: Course Thumbnails Bucket
+-- ============================================================================
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('course-thumbnails', 'course-thumbnails', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Public read access
+CREATE POLICY "course_thumbnails_public_read" ON storage.objects
+  FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'course-thumbnails');
+
+-- Write access via service_role only (admin API routes use service_role)
+CREATE POLICY "course_thumbnails_service_write" ON storage.objects
+  FOR INSERT TO service_role
+  WITH CHECK (bucket_id = 'course-thumbnails');
+
+CREATE POLICY "course_thumbnails_service_update" ON storage.objects
+  FOR UPDATE TO service_role
+  USING (bucket_id = 'course-thumbnails');
+
+CREATE POLICY "course_thumbnails_service_delete" ON storage.objects
+  FOR DELETE TO service_role
+  USING (bucket_id = 'course-thumbnails');

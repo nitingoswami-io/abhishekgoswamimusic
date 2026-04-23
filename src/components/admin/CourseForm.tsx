@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
@@ -14,27 +15,75 @@ interface Props {
 
 export default function CourseForm({ course }: Props) {
   const [loading, setLoading] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
+    course?.thumbnail_url || null
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const isEdit = !!course;
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('Only JPEG, PNG, and WebP images are allowed.');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be under 2 MB.');
+      return;
+    }
+
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+  }
+
+  function removeThumbnail() {
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  async function uploadThumbnail(file: File): Promise<string> {
+    const body = new FormData();
+    body.append('file', file);
+
+    const res = await fetch('/api/admin/upload', { method: 'POST', body });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Upload failed');
+    }
+    const { url } = await res.json();
+    return url;
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const title = formData.get('title') as string;
-    const priceRupees = parseFloat(formData.get('price') as string);
-
-    const data = {
-      title,
-      slug: (formData.get('slug') as string) || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      description: formData.get('description') as string,
-      price: Math.round(priceRupees * 100), // Convert to paise
-      thumbnail_url: formData.get('thumbnail_url') as string || null,
-      is_published: formData.get('is_published') === 'on',
-    };
-
     try {
+      let thumbnailUrl: string | null = thumbnailPreview;
+
+      // Upload new file if one was selected
+      if (thumbnailFile) {
+        thumbnailUrl = await uploadThumbnail(thumbnailFile);
+      }
+
+      const formData = new FormData(e.currentTarget);
+      const title = formData.get('title') as string;
+      const priceRupees = parseFloat(formData.get('price') as string);
+
+      const data = {
+        title,
+        slug: (formData.get('slug') as string) || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        description: formData.get('description') as string,
+        price: Math.round(priceRupees * 100),
+        thumbnail_url: thumbnailUrl,
+        is_published: formData.get('is_published') === 'on',
+      };
+
       const url = isEdit ? `/api/admin/courses/${course.id}` : '/api/admin/courses';
       const method = isEdit ? 'PUT' : 'POST';
 
@@ -95,13 +144,53 @@ export default function CourseForm({ course }: Props) {
         defaultValue={course ? (course.price / 100).toString() : ''}
         required
       />
-      <Input
-        id="thumbnail_url"
-        name="thumbnail_url"
-        label="Thumbnail URL (optional)"
-        placeholder="https://example.com/image.jpg"
-        defaultValue={course?.thumbnail_url ?? ''}
-      />
+
+      {/* Thumbnail upload */}
+      <div>
+        <label className="block text-sm font-medium text-text mb-1.5">
+          Thumbnail (optional)
+        </label>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
+        {thumbnailPreview ? (
+          <div className="relative inline-block">
+            <Image
+              src={thumbnailPreview}
+              alt="Thumbnail preview"
+              width={320}
+              height={180}
+              className="rounded-lg border border-border object-cover"
+              unoptimized={thumbnailPreview.startsWith('blob:')}
+            />
+            <button
+              type="button"
+              onClick={removeThumbnail}
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
+            >
+              &times;
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full max-w-xs h-40 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 text-text-muted hover:text-primary transition-colors cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <span className="text-sm">Click to upload image</span>
+            <span className="text-xs">JPEG, PNG, or WebP (max 2 MB)</span>
+          </button>
+        )}
+      </div>
+
       <div className="flex items-center gap-3">
         <input
           type="checkbox"
