@@ -5,6 +5,5 @@ export const SITE_DESCRIPTION =
 
 export const NAV_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/courses', label: 'Courses' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/about', label: 'About' },
 ] as const;

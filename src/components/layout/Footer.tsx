@@ -15,13 +15,13 @@ export default function Footer() {
           <div>
             <p className="label-mono mb-3">Navigate</p>
             <ul className="space-y-1.5">
-              {['Courses', 'Lessons', 'Contact'].map((item) => (
-                <li key={item}>
+              {[{ label: 'Home', href: '/' }, { label: 'About', href: '/about' }].map((item) => (
+                <li key={item.label}>
                   <a
-                    href={`/${item.toLowerCase()}`}
+                    href={item.href}
                     className="text-xs text-text-muted hover:text-text transition-colors"
                   >
-                    {item}
+                    {item.label}
                   </a>
                 </li>
               ))}
