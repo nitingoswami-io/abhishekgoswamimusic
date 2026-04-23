@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { razorpay } from '@/lib/razorpay';
+import { getRazorpay } from '@/lib/razorpay';
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     // Create Razorpay order
-    const order = await razorpay.orders.create({
+    const order = await getRazorpay().orders.create({
       amount: course.price, // already in paise
       currency: 'INR',
       notes: {
