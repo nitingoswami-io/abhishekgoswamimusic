@@ -1,0 +1,45 @@
+import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/admin-guard';
+import { supabaseAdmin } from '@/lib/supabase/admin';
+
+export async function GET() {
+  try {
+    await requireAdmin();
+    const { data, error } = await supabaseAdmin
+      .from('courses')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Error';
+    const status = message === 'Unauthorized' ? 401 : message === 'Forbidden' ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await requireAdmin();
+    const body = await request.json();
+
+    const { data, error } = await supabaseAdmin
+      .from('courses')
+      .insert(body)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'A course with this slug already exists' }, { status: 400 });
+      }
+      throw error;
+    }
+
+    return NextResponse.json(data, { status: 201 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Error';
+    const status = message === 'Unauthorized' ? 401 : message === 'Forbidden' ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
+}

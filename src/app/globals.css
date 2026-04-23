@@ -1,26 +1,88 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
+  --color-surface: var(--bg2);
+  --color-surface-light: var(--bg3);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-secondary: var(--accent);
+  --color-secondary-hover: var(--accent-hover);
+
+  --color-text: var(--fg);
+  --color-text-muted: var(--fg2);
+  --color-text-dim: var(--fg3);
+
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Dark theme (default) ── */
+:root {
+  --bg: #0a0a0a;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --border: #222222;
+  --border-hover: #333333;
+  --accent: #d4a843;
+  --accent-hover: #e0bb5e;
+  --fg: #fafafa;
+  --fg2: #737373;
+  --fg3: #525252;
+}
+
+/* ── Light theme ── */
+:root.light {
+  --bg: #ffffff;
+  --bg2: #f5f5f5;
+  --bg3: #e5e5e5;
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
+  --accent: #b8860b;
+  --accent-hover: #996f0a;
+  --fg: #0a0a0a;
+  --fg2: #6b7280;
+  --fg3: #9ca3af;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: rgba(212, 168, 67, 0.3);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 3px;
+}
+
+.smoky-gradient {
+  background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 67, 0.08) 0%, transparent 60%);
+}
+
+.label-mono {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg2);
 }

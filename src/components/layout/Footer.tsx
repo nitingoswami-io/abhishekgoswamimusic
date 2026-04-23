@@ -1,0 +1,67 @@
+import { SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
+
+export default function Footer() {
+  return (
+    <footer className="border-t border-border mt-auto">
+      <div className="max-w-5xl mx-auto px-6 sm:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Brand */}
+          <div>
+            <p className="text-sm font-semibold text-text">{SITE_NAME}</p>
+            <p className="text-xs text-text-dim mt-1">{SITE_TAGLINE}</p>
+          </div>
+
+          {/* Links */}
+          <div>
+            <p className="label-mono mb-3">Navigate</p>
+            <ul className="space-y-1.5">
+              {['Courses', 'Lessons', 'Contact'].map((item) => (
+                <li key={item}>
+                  <a
+                    href={`/${item.toLowerCase()}`}
+                    className="text-xs text-text-muted hover:text-text transition-colors"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Social */}
+          <div>
+            <p className="label-mono mb-3">Connect</p>
+            <ul className="space-y-1.5">
+              <li>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-text-muted hover:text-text transition-colors"
+                >
+                  YouTube ↗
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-text-muted hover:text-text transition-colors"
+                >
+                  Instagram ↗
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-border mt-8 pt-6 text-center">
+          <p className="text-xs text-text-dim">
+            &copy; {new Date().getFullYear()} {SITE_NAME}
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
