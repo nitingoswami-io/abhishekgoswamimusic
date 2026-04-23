@@ -28,8 +28,8 @@ const highlights = [
 ];
 
 const socials = [
-  { name: 'YouTube', href: '#' },
-  { name: 'Instagram', href: '#' },
+  { name: 'YouTube', href: 'https://www.youtube.com/@AbhishekGoswamiMusic' },
+  { name: 'Instagram', href: 'https://www.instagram.com/thisisabhishekgoswami/' },
 ];
 
 export default function AboutPage() {

@@ -34,7 +34,7 @@ export default function Footer() {
             <ul className="space-y-1.5">
               <li>
                 <a
-                  href="#"
+                  href="https://www.youtube.com/@AbhishekGoswamiMusic"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-text-muted hover:text-text transition-colors"
@@ -44,7 +44,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/thisisabhishekgoswami/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-text-muted hover:text-text transition-colors"
