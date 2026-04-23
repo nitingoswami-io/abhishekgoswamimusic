@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { formatPrice, type Course } from '@/types/database';
 import Badge from '@/components/ui/Badge';
 
@@ -16,11 +15,11 @@ export default function CourseCard({ course, purchased }: Props) {
       {/* Thumbnail */}
       <div className="aspect-video bg-surface rounded-lg overflow-hidden border border-border group-hover:border-border-hover transition-all relative">
         {course.thumbnail_url ? (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={course.thumbnail_url}
             alt={course.title}
-            fill
-            className="object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-text-dim">

@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/client';
 const ADMIN_LINKS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-  { href: '/admin/free-videos', label: 'Free Videos', icon: Video },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
 ];

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Lock, PlayCircle, Clock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
@@ -69,11 +68,10 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Thumbnail */}
           <div className="aspect-video bg-surface rounded-lg overflow-hidden border border-border mb-8">
             {course.thumbnail_url ? (
-              <Image
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
                 src={course.thumbnail_url}
                 alt={course.title}
-                width={800}
-                height={450}
                 className="w-full h-full object-cover"
               />
             ) : (

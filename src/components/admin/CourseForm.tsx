@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import toast from 'react-hot-toast';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
@@ -63,6 +62,8 @@ export default function CourseForm({ course }: Props) {
     e.preventDefault();
     setLoading(true);
 
+    const form = e.currentTarget;
+
     try {
       let thumbnailUrl: string | null = thumbnailPreview;
 
@@ -71,7 +72,7 @@ export default function CourseForm({ course }: Props) {
         thumbnailUrl = await uploadThumbnail(thumbnailFile);
       }
 
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       const title = formData.get('title') as string;
       const priceRupees = parseFloat(formData.get('price') as string);
 
@@ -147,27 +148,28 @@ export default function CourseForm({ course }: Props) {
 
       {/* Thumbnail upload */}
       <div>
-        <label className="block text-sm font-medium text-text mb-1.5">
+        <span className="block text-sm font-medium text-text mb-1.5">
           Thumbnail (optional)
-        </label>
+        </span>
+
         <input
           ref={fileInputRef}
-          id="thumbnail-upload"
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={handleFileChange}
-          className="sr-only"
+          className="block text-sm text-text-muted file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary/90 file:cursor-pointer"
         />
+        <span className="text-xs text-text-muted mt-1 block">JPEG, PNG, or WebP (max 2 MB)</span>
 
-        {thumbnailPreview ? (
-          <div className="relative inline-block">
-            <Image
+        {thumbnailPreview && (
+          <div className="relative inline-block mt-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={thumbnailPreview}
               alt="Thumbnail preview"
               width={320}
               height={180}
               className="rounded-lg border border-border object-cover"
-              unoptimized={thumbnailPreview.startsWith('blob:')}
             />
             <button
               type="button"
@@ -177,17 +179,6 @@ export default function CourseForm({ course }: Props) {
               &times;
             </button>
           </div>
-        ) : (
-          <label
-            htmlFor="thumbnail-upload"
-            className="w-full max-w-xs h-40 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 text-text-muted hover:text-primary transition-colors cursor-pointer"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-            </svg>
-            <span className="text-sm">Click to upload image</span>
-            <span className="text-xs">JPEG, PNG, or WebP (max 2 MB)</span>
-          </label>
         )}
       </div>
 
