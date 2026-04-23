@@ -19,7 +19,7 @@ export default function HeroSection() {
 
           <p className="text-base sm:text-lg text-text-muted leading-relaxed max-w-lg mb-12">
             Exploring the art of solo guitar — where jazz harmony meets fingerstyle technique.
-            Learn through structured courses and free lessons.
+            Learn through structured courses.
           </p>
 
           <div className="flex items-center gap-6">
@@ -29,12 +29,7 @@ export default function HeroSection() {
             >
               Explore Courses
             </Link>
-            <Link
-              href="/free-videos"
-              className="text-sm text-text-muted hover:text-text transition-colors"
-            >
-              Free Lessons ↗
-            </Link>
+           
           </div>
         </div>
       </div>
