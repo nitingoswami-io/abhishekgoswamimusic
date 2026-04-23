@@ -41,6 +41,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Already purchased' }, { status: 400 });
     }
 
+    // Debug: log env var presence (not values)
+    console.log('RAZORPAY_KEY_ID present:', !!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
+    console.log('RAZORPAY_KEY_ID prefix:', process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.substring(0, 8));
+    console.log('RAZORPAY_KEY_SECRET present:', !!process.env.RAZORPAY_KEY_SECRET);
+    console.log('RAZORPAY_KEY_SECRET length:', process.env.RAZORPAY_KEY_SECRET?.length);
+
     // Create Razorpay order
     const order = await getRazorpay().orders.create({
       amount: course.price, // already in paise
