@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import CourseCard from '@/components/courses/CourseCard';
 import type { PurchaseWithCourse } from '@/types/database';
 
@@ -18,7 +18,7 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login');
 
-  const { data: purchases } = await supabaseAdmin
+  const { data: purchases } = await getSupabaseAdmin()
     .from('purchases')
     .select('*, courses(*)')
     .eq('user_id', user.id)

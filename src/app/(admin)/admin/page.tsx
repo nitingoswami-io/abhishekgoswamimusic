@@ -1,5 +1,5 @@
 import { BookOpen, Users, CreditCard, MessageSquare } from 'lucide-react';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/types/database';
 
 export const metadata = { title: 'Admin Dashboard' };
@@ -10,9 +10,9 @@ export default async function AdminDashboardPage() {
     { data: purchases },
     { count: messageCount },
   ] = await Promise.all([
-    supabaseAdmin.from('courses').select('*', { count: 'exact', head: true }),
-    supabaseAdmin.from('purchases').select('amount, user_id').eq('status', 'completed'),
-    supabaseAdmin
+    getSupabaseAdmin().from('courses').select('*', { count: 'exact', head: true }),
+    getSupabaseAdmin().from('purchases').select('amount, user_id').eq('status', 'completed'),
+    getSupabaseAdmin()
       .from('contact_messages')
       .select('*', { count: 'exact', head: true })
       .eq('is_read', false),

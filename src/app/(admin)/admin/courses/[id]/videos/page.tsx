@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import VideoManager from '@/components/admin/VideoManager';
 
 export const metadata = { title: 'Manage Videos' };
@@ -12,8 +12,8 @@ export default async function ManageVideosPage({ params }: Props) {
   const { id } = await params;
 
   const [{ data: course }, { data: videos }] = await Promise.all([
-    supabaseAdmin.from('courses').select('id, title').eq('id', id).single(),
-    supabaseAdmin
+    getSupabaseAdmin().from('courses').select('id, title').eq('id', id).single(),
+    getSupabaseAdmin()
       .from('course_videos')
       .select('*')
       .eq('course_id', id)

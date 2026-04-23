@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-guard';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 interface Context {
   params: Promise<{ id: string }>;
@@ -12,7 +12,7 @@ export async function PUT(request: Request, { params }: Context) {
     const { id } = await params;
     const body = await request.json();
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('courses')
       .update(body)
       .eq('id', id)
@@ -33,7 +33,7 @@ export async function DELETE(_request: Request, { params }: Context) {
     await requireAdmin();
     const { id } = await params;
 
-    const { error } = await supabaseAdmin.from('courses').delete().eq('id', id);
+    const { error } = await getSupabaseAdmin().from('courses').delete().eq('id', id);
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {

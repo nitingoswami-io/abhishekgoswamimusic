@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-guard';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function GET() {
   try {
     await requireAdmin();
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('free_videos')
       .select('*')
       .order('sort_order');
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     await requireAdmin();
     const body = await request.json();
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('free_videos')
       .insert(body)
       .select()
@@ -43,7 +43,7 @@ export async function PUT(request: Request) {
     await requireAdmin();
     const { id, ...body } = await request.json();
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('free_videos')
       .update(body)
       .eq('id', id)
@@ -64,7 +64,7 @@ export async function DELETE(request: Request) {
     await requireAdmin();
     const { id } = await request.json();
 
-    const { error } = await supabaseAdmin.from('free_videos').delete().eq('id', id);
+    const { error } = await getSupabaseAdmin().from('free_videos').delete().eq('id', id);
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {

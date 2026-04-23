@@ -1,11 +1,11 @@
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/types/database';
 import Badge from '@/components/ui/Badge';
 
 export const metadata = { title: 'Payments' };
 
 export default async function AdminPaymentsPage() {
-  const { data: purchases } = await supabaseAdmin
+  const { data: purchases } = await getSupabaseAdmin()
     .from('purchases')
     .select('*, profiles(email, full_name), courses(title)')
     .order('created_at', { ascending: false });

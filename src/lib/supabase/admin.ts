@@ -11,10 +11,3 @@ export function getSupabaseAdmin() {
   }
   return _supabaseAdmin;
 }
-
-// Keep backward-compatible export as a getter
-export const supabaseAdmin = new Proxy({} as SupabaseClient, {
-  get(_, prop) {
-    return (getSupabaseAdmin() as Record<string | symbol, unknown>)[prop];
-  },
-});

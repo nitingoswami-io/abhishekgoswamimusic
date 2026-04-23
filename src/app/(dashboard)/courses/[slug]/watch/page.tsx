@@ -1,6 +1,6 @@
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import CoursePlayer from '@/components/player/CoursePlayer';
 import type { CourseVideo } from '@/types/database';
 
@@ -10,7 +10,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const { data: course } = await supabaseAdmin
+  const { data: course } = await getSupabaseAdmin()
     .from('courses')
     .select('title')
     .eq('slug', slug)
@@ -29,7 +29,7 @@ export default async function WatchCoursePage({ params }: Props) {
   if (!user) redirect(`/login?redirect=/courses/${slug}/watch`);
 
   // Fetch course
-  const { data: course } = await supabaseAdmin
+  const { data: course } = await getSupabaseAdmin()
     .from('courses')
     .select('*')
     .eq('slug', slug)
@@ -38,7 +38,7 @@ export default async function WatchCoursePage({ params }: Props) {
   if (!course) notFound();
 
   // Verify purchase
-  const { data: purchase } = await supabaseAdmin
+  const { data: purchase } = await getSupabaseAdmin()
     .from('purchases')
     .select('id')
     .eq('user_id', user.id)
@@ -49,7 +49,7 @@ export default async function WatchCoursePage({ params }: Props) {
   if (!purchase) redirect(`/courses/${slug}`);
 
   // Fetch all videos (with URLs — user has paid)
-  const { data: videos } = await supabaseAdmin
+  const { data: videos } = await getSupabaseAdmin()
     .from('course_videos')
     .select('*')
     .eq('course_id', course.id)

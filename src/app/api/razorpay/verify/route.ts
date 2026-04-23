@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     if (expectedSignature !== razorpay_signature) {
       // Update purchase as failed
-      await supabaseAdmin
+      await getSupabaseAdmin()
         .from('purchases')
         .update({
           status: 'failed',
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     }
 
     // Update purchase as completed
-    const { error } = await supabaseAdmin
+    const { error } = await getSupabaseAdmin()
       .from('purchases')
       .update({
         status: 'completed',

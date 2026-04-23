@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function requireAdmin() {
   const supabase = await createClient();
@@ -11,7 +11,7 @@ export async function requireAdmin() {
     throw new Error('Unauthorized');
   }
 
-  const { data: profile } = await supabaseAdmin
+  const { data: profile } = await getSupabaseAdmin()
     .from('profiles')
     .select('role')
     .eq('id', user.id)

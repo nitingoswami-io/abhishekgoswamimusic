@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import CourseForm from '@/components/admin/CourseForm';
 
 export const metadata = { title: 'Edit Course' };
@@ -11,7 +11,7 @@ interface Props {
 export default async function EditCoursePage({ params }: Props) {
   const { id } = await params;
 
-  const { data: course } = await supabaseAdmin
+  const { data: course } = await getSupabaseAdmin()
     .from('courses')
     .select('*')
     .eq('id', id)

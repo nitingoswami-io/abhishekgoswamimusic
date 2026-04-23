@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Lock, PlayCircle, Clock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/types/database';
 import Badge from '@/components/ui/Badge';
 import BuyButton from '@/components/courses/BuyButton';
@@ -15,7 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const { data: course } = await supabaseAdmin
+  const { data: course } = await getSupabaseAdmin()
     .from('courses')
     .select('title, description')
     .eq('slug', slug)
@@ -30,7 +30,7 @@ export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params;
   const supabase = await createClient();
 
-  const { data: course } = await supabaseAdmin
+  const { data: course } = await getSupabaseAdmin()
     .from('courses')
     .select('*')
     .eq('slug', slug)
@@ -39,7 +39,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
   if (!course) notFound();
 
-  const { data: videos } = await supabaseAdmin
+  const { data: videos } = await getSupabaseAdmin()
     .from('course_videos')
     .select('id, title, sort_order, is_preview, duration_minutes')
     .eq('course_id', course.id)
@@ -51,7 +51,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
   let hasPurchased = false;
   if (user) {
-    const { data: purchase } = await supabaseAdmin
+    const { data: purchase } = await getSupabaseAdmin()
       .from('purchases')
       .select('id')
       .eq('user_id', user.id)

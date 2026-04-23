@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/types/database';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -9,7 +9,7 @@ import { Plus, Pencil, Video } from 'lucide-react';
 export const metadata = { title: 'Manage Courses' };
 
 export default async function AdminCoursesPage() {
-  const { data: courses } = await supabaseAdmin
+  const { data: courses } = await getSupabaseAdmin()
     .from('courses')
     .select('*')
     .order('created_at', { ascending: false });

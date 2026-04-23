@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { getRazorpay } from '@/lib/razorpay';
 
 export async function POST(request: Request) {
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const { courseId } = await request.json();
 
     // Fetch course
-    const { data: course, error: courseError } = await supabaseAdmin
+    const { data: course, error: courseError } = await getSupabaseAdmin()
       .from('courses')
       .select('id, title, price')
       .eq('id', courseId)
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     // Check if already purchased
-    const { data: existingPurchase } = await supabaseAdmin
+    const { data: existingPurchase } = await getSupabaseAdmin()
       .from('purchases')
       .select('id')
       .eq('user_id', user.id)
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     });
 
     // Create pending purchase record
-    await supabaseAdmin.from('purchases').upsert(
+    await getSupabaseAdmin().from('purchases').upsert(
       {
         user_id: user.id,
         course_id: courseId,

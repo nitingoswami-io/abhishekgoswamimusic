@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-guard';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function GET() {
   try {
     await requireAdmin();
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('courses')
       .select('*')
       .order('created_at', { ascending: false });
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     await requireAdmin();
     const body = await request.json();
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('courses')
       .insert(body)
       .select()

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-guard';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 interface Context {
   params: Promise<{ id: string }>;
@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: Context) {
     await requireAdmin();
     const { id } = await params;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('course_videos')
       .select('*')
       .eq('course_id', id)
@@ -32,7 +32,7 @@ export async function POST(request: Request, { params }: Context) {
     const { id } = await params;
     const body = await request.json();
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('course_videos')
       .insert({ ...body, course_id: id })
       .select()
@@ -52,7 +52,7 @@ export async function PUT(request: Request) {
     await requireAdmin();
     const { videoId, ...body } = await request.json();
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('course_videos')
       .update(body)
       .eq('id', videoId)
@@ -73,7 +73,7 @@ export async function DELETE(request: Request) {
     await requireAdmin();
     const { videoId } = await request.json();
 
-    const { error } = await supabaseAdmin.from('course_videos').delete().eq('id', videoId);
+    const { error } = await getSupabaseAdmin().from('course_videos').delete().eq('id', videoId);
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {

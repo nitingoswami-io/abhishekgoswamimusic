@@ -1,10 +1,10 @@
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import FreeVideoManager from '@/components/admin/FreeVideoManager';
 
 export const metadata = { title: 'Manage Free Videos' };
 
 export default async function AdminFreeVideosPage() {
-  const { data: videos } = await supabaseAdmin
+  const { data: videos } = await getSupabaseAdmin()
     .from('free_videos')
     .select('*')
     .order('sort_order');
