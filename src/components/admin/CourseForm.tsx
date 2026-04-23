@@ -152,10 +152,11 @@ export default function CourseForm({ course }: Props) {
         </label>
         <input
           ref={fileInputRef}
+          id="thumbnail-upload"
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={handleFileChange}
-          className="hidden"
+          className="sr-only"
         />
 
         {thumbnailPreview ? (
@@ -177,9 +178,8 @@ export default function CourseForm({ course }: Props) {
             </button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
+          <label
+            htmlFor="thumbnail-upload"
             className="w-full max-w-xs h-40 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 text-text-muted hover:text-primary transition-colors cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -187,7 +187,7 @@ export default function CourseForm({ course }: Props) {
             </svg>
             <span className="text-sm">Click to upload image</span>
             <span className="text-xs">JPEG, PNG, or WebP (max 2 MB)</span>
-          </button>
+          </label>
         )}
       </div>
 
