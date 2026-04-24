@@ -28,7 +28,7 @@ export default function AdminSidebar() {
       <div className="px-4 py-4 border-b border-border">
         <p className="text-sm font-semibold text-text">Admin</p>
         <p className="text-[0.6rem] text-text-dim font-mono uppercase tracking-widest mt-0.5">
-          Abhishek Goswami
+          Abhishek Goswami Music
         </p>
       </div>
 
