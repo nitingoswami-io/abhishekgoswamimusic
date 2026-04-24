@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Nunito, Fraunces, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -7,9 +7,17 @@ import ThemeInit from '@/components/ThemeInit';
 import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const nunito = Nunito({
+  variable: '--font-nunito',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+});
+
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  subsets: ['latin'],
+  weight: ['700', '800', '900'],
+  style: ['normal', 'italic'],
 });
 
 const geistMono = Geist_Mono({
@@ -20,8 +28,8 @@ const geistMono = Geist_Mono({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5, // allow pinch-zoom for accessibility
-  themeColor: '#0a0a0a',
+  maximumScale: 5,
+  themeColor: '#110a00',
 };
 
 export const metadata: Metadata = {
@@ -38,17 +46,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${nunito.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
         <ThemeInit />
         <Toaster
           position="top-center"
           toastOptions={{
             style: {
-              background: '#111111',
-              color: '#fafafa',
-              border: '1px solid #222222',
+              background: '#1c1100',
+              color: '#fdf4e7',
+              border: '1px solid #3d2a0f',
               fontSize: '0.875rem',
+              fontFamily: 'var(--font-nunito)',
             },
           }}
         />

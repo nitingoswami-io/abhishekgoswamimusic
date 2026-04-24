@@ -19,47 +19,56 @@
   --color-danger: #dc2626;
   --color-success: #16a34a;
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-nunito);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
 }
 
-/* ── Dark theme (default) ── */
+/* ── Vintage Vinyl — Dark (default) ── */
 :root {
-  --bg: #0a0a0a;
-  --bg2: #111111;
-  --bg3: #1a1a1a;
-  --border: #222222;
-  --border-hover: #333333;
-  --accent: #d4a843;
-  --accent-hover: #e0bb5e;
-  --fg: #fafafa;
-  --fg2: #737373;
-  --fg3: #525252;
+  --bg: #110a00;
+  --bg2: #1c1100;
+  --bg3: #261800;
+  --border: #2e1f08;
+  --border-hover: #3d2a0f;
+  --accent: #ff6b35;
+  --accent-hover: #ff8c5a;
+  --fg: #fdf4e7;
+  --fg2: #a08060;
+  --fg3: #6b5040;
 }
 
-/* ── Light theme ── */
+/* ── Vintage Vinyl — Light ── */
 :root.light {
-  --bg: #ffffff;
-  --bg2: #f5f5f5;
-  --bg3: #e5e5e5;
-  --border: #e5e7eb;
-  --border-hover: #d1d5db;
-  --accent: #b8860b;
-  --accent-hover: #996f0a;
-  --fg: #0a0a0a;
-  --fg2: #6b7280;
-  --fg3: #9ca3af;
+  --bg: #fff8ef;
+  --bg2: #fdefd8;
+  --bg3: #f5e0c0;
+  --border: #e8c99a;
+  --border-hover: #d4b080;
+  --accent: #d44a10;
+  --accent-hover: #b83d0d;
+  --fg: #1c0a00;
+  --fg2: #7a5030;
+  --fg3: #a07050;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-nunito), system-ui, sans-serif;
+  font-weight: 500;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Fraunces for all headings — bold, ink-press personality */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 ::selection {
-  background: rgba(212, 168, 67, 0.3);
+  background: rgba(255, 107, 53, 0.3);
 }
 
 ::-webkit-scrollbar {
@@ -76,7 +85,7 @@ body {
 }
 
 .smoky-gradient {
-  background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 67, 0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 107, 53, 0.1) 0%, transparent 60%);
 }
 
 .label-mono {
