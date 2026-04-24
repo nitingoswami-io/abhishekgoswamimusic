@@ -60,34 +60,60 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Social */}
-      <section className="border-t border-border pt-16 mb-16">
-        <p className="label-mono mb-6">Connect</p>
-        <div className="flex items-center gap-4">
-          {socials.map((s) => (
-            <a
-              key={s.name}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 text-sm border border-border rounded hover:border-primary hover:text-primary text-text-muted transition-colors"
-            >
-              {s.name} ↗
-            </a>
-          ))}
-        </div>
-      </section>
-
       {/* Contact */}
       <section className="border-t border-border pt-16">
-        <p className="label-mono mb-4">Reach Out</p>
-        <h2 className="text-2xl sm:text-3xl font-bold text-text mb-3">Contact</h2>
-        <p className="text-sm text-text-muted mb-10">
-          Have a question, booking inquiry, or feedback? Drop a message.
-        </p>
+        <p className="label-mono mb-10">Get in Touch</p>
 
-        <div className="max-w-lg border border-border rounded-lg p-6 sm:p-8">
-          <ContactForm />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+          {/* Left — Info */}
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-text mb-4">
+              Let&apos;s Connect
+            </h2>
+            <p className="text-sm text-text-muted leading-relaxed mb-8 max-w-md">
+              Have a question about courses, want to collaborate on a project, or
+              looking to book for an event? Leave me a message — I typically respond
+              within 24 hours.
+            </p>
+
+            <div className="space-y-6">
+              <div>
+                <p className="text-[0.65rem] font-mono uppercase tracking-[0.18em] text-primary mb-2">
+                  Email
+                </p>
+                <a
+                  href="mailto:contact@abhishekgoswami.com"
+                  className="text-sm text-text hover:text-primary transition-colors"
+                >
+                  contact@abhishekgoswami.com
+                </a>
+              </div>
+
+              <div>
+                <p className="text-[0.65rem] font-mono uppercase tracking-[0.18em] text-primary mb-3">
+                  Social
+                </p>
+                <div className="flex items-center gap-3">
+                  {socials.map((s) => (
+                    <a
+                      key={s.name}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 text-sm border border-border rounded hover:border-primary hover:text-primary text-text-muted transition-colors"
+                    >
+                      {s.name} ↗
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right — Form */}
+          <div className="border border-border rounded-lg p-6 sm:p-8">
+            <ContactForm />
+          </div>
         </div>
       </section>
     </div>
