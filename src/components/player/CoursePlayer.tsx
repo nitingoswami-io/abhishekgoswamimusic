@@ -30,9 +30,9 @@ export default function CoursePlayer({ videos }: Props) {
         <div className="aspect-video bg-black rounded-lg overflow-hidden border border-border">
           <iframe
             key={activeVideo.id}
-            src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1`}
+            src={`https://www.youtube-nocookie.com/embed/${ytId}`}
             title={activeVideo.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             className="w-full h-full"
           />
@@ -48,7 +48,7 @@ export default function CoursePlayer({ videos }: Props) {
       {/* Sidebar */}
       <div className="lg:col-span-1">
         <p className="label-mono mb-3">Lessons</p>
-        <div className="space-y-1 max-h-[calc(100vh-16rem)] overflow-y-auto border border-border rounded-lg divide-y divide-border">
+        <div className="space-y-1 max-h-64 lg:max-h-[calc(100vh-16rem)] overflow-y-auto border border-border rounded-lg divide-y divide-border">
           {videos.map((video, index) => (
             <button
               key={video.id}

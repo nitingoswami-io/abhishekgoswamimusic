@@ -1,19 +1,9 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, courseId } =
       await request.json();
 
@@ -25,39 +15,39 @@ export async function POST(request: Request) {
       .digest('hex');
 
     if (expectedSignature !== razorpay_signature) {
-      // Update purchase as failed
       await getSupabaseAdmin()
         .from('purchases')
-        .update({
-          status: 'failed',
-          razorpay_payment_id,
-          razorpay_signature,
-        })
-        .eq('user_id', user.id)
-        .eq('course_id', courseId)
+        .update({ status: 'failed', razorpay_payment_id, razorpay_signature })
         .eq('razorpay_order_id', razorpay_order_id);
 
       return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 });
     }
 
-    // Update purchase as completed
-    const { error } = await getSupabaseAdmin()
+    // Update purchase as completed and fetch the access token
+    const { data: purchase, error } = await getSupabaseAdmin()
       .from('purchases')
-      .update({
-        status: 'completed',
-        razorpay_payment_id,
-        razorpay_signature,
-      })
-      .eq('user_id', user.id)
-      .eq('course_id', courseId)
-      .eq('razorpay_order_id', razorpay_order_id);
+      .update({ status: 'completed', razorpay_payment_id, razorpay_signature })
+      .eq('razorpay_order_id', razorpay_order_id)
+      .select('access_token, course_id')
+      .single();
 
-    if (error) {
+    if (error || !purchase) {
       console.error('Update purchase error:', error);
       return NextResponse.json({ error: 'Failed to update purchase' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true });
+
+    // Set a per-course httpOnly cookie so the watch page can verify access without auth
+    response.cookies.set(`purchase_access_${courseId}`, purchase.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      path: '/',
+      sameSite: 'lax',
+    });
+
+    return response;
   } catch (error) {
     console.error('Verify payment error:', error);
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 });

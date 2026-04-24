@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@/types/database';
+import GuestCheckoutModal from '@/components/courses/GuestCheckoutModal';
 
 interface Props {
   courseId: string;
@@ -21,15 +22,16 @@ declare global {
 
 export default function BuyButton({ courseId, courseTitle, price, slug }: Props) {
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
-  const handleBuy = async () => {
+  const handleBuy = async (email: string, phone: string) => {
     setLoading(true);
     try {
       const res = await fetch('/api/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId }),
+        body: JSON.stringify({ courseId, email, phone }),
       });
 
       if (!res.ok) {
@@ -39,6 +41,8 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
 
       const { orderId, amount, currency } = await res.json();
 
+      setShowModal(false);
+
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount,
@@ -46,6 +50,7 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
         name: 'Abhishek Goswami',
         description: courseTitle,
         order_id: orderId,
+        prefill: { email, contact: phone },
         handler: async function (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;
@@ -64,8 +69,7 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
 
           if (verifyRes.ok) {
             toast.success('Payment successful!');
-            router.push(`/courses/${slug}/watch`);
-            router.refresh();
+            router.push(`/purchase/success?course=${slug}`);
           } else {
             toast.error('Payment verification failed. Contact support.');
           }
@@ -79,6 +83,7 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
       rzp.open();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Something went wrong');
+      setShowModal(true);
     } finally {
       setLoading(false);
     }
@@ -87,12 +92,22 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+
+      {showModal && (
+        <GuestCheckoutModal
+          courseTitle={courseTitle}
+          onConfirm={handleBuy}
+          onClose={() => setShowModal(false)}
+          loading={loading}
+        />
+      )}
+
       <button
-        onClick={handleBuy}
+        onClick={() => setShowModal(true)}
         disabled={loading}
         className="w-full px-5 py-2.5 bg-primary text-background text-sm font-medium rounded hover:bg-primary-hover transition-colors disabled:opacity-40"
       >
-        {loading ? 'Processing...' : `Buy Now — ${formatPrice(price)}`}
+        {loading ? 'Processing…' : `Buy Now — ${formatPrice(price)}`}
       </button>
     </>
   );

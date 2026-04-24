@@ -11,7 +11,7 @@ export default async function AdminDashboardPage() {
     { count: messageCount },
   ] = await Promise.all([
     getSupabaseAdmin().from('courses').select('*', { count: 'exact', head: true }),
-    getSupabaseAdmin().from('purchases').select('amount, user_id').eq('status', 'completed'),
+    getSupabaseAdmin().from('purchases').select('amount, email').eq('status', 'completed'),
     getSupabaseAdmin()
       .from('contact_messages')
       .select('*', { count: 'exact', head: true })
@@ -19,7 +19,7 @@ export default async function AdminDashboardPage() {
   ]);
 
   const totalRevenue = purchases?.reduce((sum, p) => sum + p.amount, 0) ?? 0;
-  const uniqueStudents = new Set(purchases?.map((p) => p.user_id)).size;
+  const uniqueStudents = new Set(purchases?.map((p) => p.email).filter(Boolean)).size;
 
   const stats = [
     { label: 'Courses', value: courseCount ?? 0, icon: BookOpen },

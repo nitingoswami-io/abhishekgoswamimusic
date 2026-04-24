@@ -24,28 +24,18 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Protect admin routes — requires authentication + admin role
+  // /admin/login is the login page itself — must be reachable unauthenticated
+  if (
+    request.nextUrl.pathname.startsWith('/admin') &&
+    request.nextUrl.pathname !== '/admin/login'
+  ) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  // Protect dashboard routes
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    return NextResponse.redirect(
-      new URL(`/login?redirect=${encodeURIComponent(request.nextUrl.pathname)}`, request.url)
-    );
-  }
-
-  // Protect course watch routes
-  if (request.nextUrl.pathname.match(/\/courses\/.*\/watch/) && !user) {
-    return NextResponse.redirect(
-      new URL(`/login?redirect=${encodeURIComponent(request.nextUrl.pathname)}`, request.url)
-    );
-  }
-
-  // Protect admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
     const { data: profile } = await supabase
@@ -63,5 +53,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/courses/:slug/watch/:path*'],
+  matcher: ['/admin/:path*'],
 };

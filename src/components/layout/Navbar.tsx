@@ -8,49 +8,57 @@ import { createClient } from '@/lib/supabase/client';
 import { NAV_LINKS, SITE_NAME } from '@/lib/constants';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import type { User } from '@supabase/supabase-js';
-import type { Profile } from '@/types/database';
+
+const PROFILE_CACHE_KEY = 'navbar_admin_role';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        setProfile(data);
+    const fetchRole = async (userId: string) => {
+      // Serve from sessionStorage cache to avoid a DB round-trip on every navigation
+      const cached = sessionStorage.getItem(PROFILE_CACHE_KEY);
+      if (cached) {
+        setIsAdmin(cached === 'admin');
+        return;
+      }
+      const { data } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      if (data?.role) {
+        sessionStorage.setItem(PROFILE_CACHE_KEY, data.role);
+        setIsAdmin(data.role === 'admin');
       }
     };
 
-    getUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (!session?.user) setProfile(null);
+    // onAuthStateChange fires near-instantly with INITIAL_SESSION from the local
+    // cookie cache — no network round-trip needed, unlike getUser().
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        fetchRole(currentUser.id);
+      } else {
+        setIsAdmin(false);
+        sessionStorage.removeItem(PROFILE_CACHE_KEY);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
+    sessionStorage.removeItem(PROFILE_CACHE_KEY);
     await supabase.auth.signOut();
     setUser(null);
-    setProfile(null);
+    setIsAdmin(false);
     router.push('/');
     router.refresh();
   };
@@ -61,7 +69,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-sm border-b border-border">
       <div className="max-w-5xl mx-auto px-6 sm:px-8">
         <div className="flex items-center justify-between h-14">
-          {/* Logo — minimal text */}
+          {/* Logo */}
           <Link href="/" className="text-sm font-semibold tracking-tight text-text">
             {SITE_NAME}
           </Link>
@@ -73,9 +81,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`px-3 py-1.5 text-xs tracking-wide transition-colors ${
-                  pathname === link.href
-                    ? 'text-primary'
-                    : 'text-text-muted hover:text-text'
+                  pathname === link.href ? 'text-primary' : 'text-text-muted hover:text-text'
                 }`}
               >
                 {link.label}
@@ -84,56 +90,33 @@ export default function Navbar() {
 
             <ThemeToggle />
 
-            {/* Separator */}
-            <span className="w-px h-4 bg-border mx-2" />
-
-            {user ? (
+            {user && isAdmin && (
               <>
-                {profile?.role === 'admin' && (
-                  <Link
-                    href="/admin"
-                    className="px-3 py-1.5 text-xs text-text-muted hover:text-text transition-colors"
-                  >
-                    <LayoutDashboard className="w-3.5 h-3.5 inline mr-1" />
-                    Admin
-                  </Link>
-                )}
+                <span className="w-px h-4 bg-border mx-2" />
                 <Link
-                  href="/dashboard"
+                  href="/admin"
                   className="px-3 py-1.5 text-xs text-text-muted hover:text-text transition-colors"
                 >
-                  My Courses
+                  <LayoutDashboard className="w-3.5 h-3.5 inline mr-1" />
+                  Admin
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 text-text-dim hover:text-text transition-colors"
+                  className="p-2 text-text-dim hover:text-text transition-colors"
                   title="Logout"
+                  aria-label="Logout"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
               </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="px-3 py-1.5 text-xs text-text-muted hover:text-text transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-3 py-1.5 text-xs border border-border hover:border-primary text-text transition-colors rounded"
-                >
-                  Sign Up
-                </Link>
-              </>
             )}
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger — 44px touch target */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-1.5 text-text-muted hover:text-text"
+            className="md:hidden p-3 -mr-2 text-text-muted hover:text-text"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -149,60 +132,32 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`block py-2 text-sm transition-colors ${
-                  pathname === link.href
-                    ? 'text-primary'
-                    : 'text-text-muted hover:text-text'
+                className={`block py-3 text-sm transition-colors ${
+                  pathname === link.href ? 'text-primary' : 'text-text-muted hover:text-text'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
             <div className="border-t border-border pt-3 mt-3">
-              {user ? (
+              {user && isAdmin ? (
                 <>
-                  {profile?.role === 'admin' && (
-                    <Link
-                      href="/admin"
-                      onClick={() => setMobileOpen(false)}
-                      className="block py-2 text-sm text-text-muted hover:text-text"
-                    >
-                      Admin Panel
-                    </Link>
-                  )}
                   <Link
-                    href="/dashboard"
+                    href="/admin"
                     onClick={() => setMobileOpen(false)}
-                    className="block py-2 text-sm text-text-muted hover:text-text"
+                    className="block py-3 text-sm text-text-muted hover:text-text"
                   >
-                    My Courses
+                    Admin Panel
                   </Link>
                   <button
-                    onClick={() => {
-                      handleLogout();
-                      setMobileOpen(false);
-                    }}
-                    className="block py-2 text-sm text-danger"
+                    onClick={() => { handleLogout(); setMobileOpen(false); }}
+                    className="block py-3 text-sm text-danger"
                   >
                     Logout
                   </button>
                 </>
               ) : (
-                <div className="flex items-center gap-3 pt-1">
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="text-sm text-text-muted hover:text-text"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileOpen(false)}
-                    className="text-sm text-primary"
-                  >
-                    Sign Up
-                  </Link>
+                <div className="flex items-center pt-1">
                   <span className="ml-auto"><ThemeToggle /></span>
                 </div>
               )}

@@ -33,8 +33,11 @@ export interface CourseVideo {
 
 export interface Purchase {
   id: string;
-  user_id: string;
+  user_id: string | null;
   course_id: string;
+  email: string | null;
+  phone: string | null;
+  access_token: string | null;
   razorpay_order_id: string | null;
   razorpay_payment_id: string | null;
   razorpay_signature: string | null;

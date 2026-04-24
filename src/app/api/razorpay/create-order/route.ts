@@ -1,20 +1,18 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import crypto from 'crypto';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { getRazorpay } from '@/lib/razorpay';
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { courseId, email, phone } = await request.json();
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Valid email address is required' }, { status: 400 });
     }
-
-    const { courseId } = await request.json();
+    if (!phone || phone.trim().length < 7) {
+      return NextResponse.json({ error: 'Valid phone number is required' }, { status: 400 });
+    }
 
     // Fetch course
     const { data: course, error: courseError } = await getSupabaseAdmin()
@@ -28,46 +26,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    // Check if already purchased
+    // Check if already purchased with this email
     const { data: existingPurchase } = await getSupabaseAdmin()
       .from('purchases')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('email', email.trim().toLowerCase())
       .eq('course_id', courseId)
       .eq('status', 'completed')
-      .single();
+      .maybeSingle();
 
     if (existingPurchase) {
-      return NextResponse.json({ error: 'Already purchased' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'This course has already been purchased with this email address' },
+        { status: 400 }
+      );
     }
-
-    // Debug: log env var presence (not values)
-    console.log('RAZORPAY_KEY_ID present:', !!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
-    console.log('RAZORPAY_KEY_ID prefix:', process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.substring(0, 8));
-    console.log('RAZORPAY_KEY_SECRET present:', !!process.env.RAZORPAY_KEY_SECRET);
-    console.log('RAZORPAY_KEY_SECRET length:', process.env.RAZORPAY_KEY_SECRET?.length);
 
     // Create Razorpay order
     const order = await getRazorpay().orders.create({
-      amount: course.price, // already in paise
+      amount: course.price,
       currency: 'INR',
       notes: {
         courseId: course.id,
-        userId: user.id,
+        email: email.trim().toLowerCase(),
       },
     });
 
-    // Create pending purchase record
-    await getSupabaseAdmin().from('purchases').upsert(
-      {
-        user_id: user.id,
-        course_id: courseId,
-        razorpay_order_id: order.id,
-        amount: course.price,
-        status: 'pending',
-      },
-      { onConflict: 'user_id,course_id' }
-    );
+    // Create pending purchase record with access token
+    await getSupabaseAdmin().from('purchases').insert({
+      user_id: null,
+      course_id: courseId,
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      razorpay_order_id: order.id,
+      amount: course.price,
+      status: 'pending',
+      access_token: crypto.randomUUID(),
+    });
 
     return NextResponse.json({
       orderId: order.id,

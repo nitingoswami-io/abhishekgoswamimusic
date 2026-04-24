@@ -1,5 +1,5 @@
 -- ============================================================================
--- Abhishek Goswami Music - Database Migration
+-- Abhishek Goswami Music — Database Migration (complete, current schema)
 -- Run this in Supabase SQL Editor after creating your project
 -- ============================================================================
 
@@ -63,23 +63,27 @@ CREATE TABLE public.course_videos (
 
 CREATE INDEX idx_course_videos_course ON public.course_videos(course_id);
 
--- PURCHASES TABLE
+-- PURCHASES TABLE (guest checkout — user_id is nullable)
 CREATE TABLE public.purchases (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,  -- nullable for guest purchases
   course_id UUID NOT NULL REFERENCES public.courses(id) ON DELETE CASCADE,
+  email TEXT,          -- guest buyer email
+  phone TEXT,          -- guest buyer phone
+  access_token UUID DEFAULT gen_random_uuid() UNIQUE,  -- cookie-based content access
   razorpay_order_id TEXT,
   razorpay_payment_id TEXT,
   razorpay_signature TEXT,
   amount INTEGER NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE(user_id, course_id)
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_purchases_user ON public.purchases(user_id);
 CREATE INDEX idx_purchases_course ON public.purchases(course_id);
 CREATE INDEX idx_purchases_status ON public.purchases(status);
+CREATE INDEX idx_purchases_email ON public.purchases(email);
+CREATE INDEX idx_purchases_access_token ON public.purchases(access_token);
 
 -- FREE VIDEOS TABLE
 CREATE TABLE public.free_videos (
@@ -149,33 +153,18 @@ CREATE POLICY "courses_public_read" ON public.courses
 CREATE POLICY "courses_service_all" ON public.courses
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
--- COURSE VIDEOS (gated: only purchasers or preview videos)
+-- COURSE VIDEOS (gated: preview visible to all, full access via service_role)
 ALTER TABLE public.course_videos ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "course_videos_preview" ON public.course_videos
   FOR SELECT TO anon, authenticated
   USING (is_preview = true);
 
-CREATE POLICY "course_videos_purchased" ON public.course_videos
-  FOR SELECT TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.purchases
-      WHERE purchases.course_id = course_videos.course_id
-      AND purchases.user_id = auth.uid()
-      AND purchases.status = 'completed'
-    )
-  );
-
 CREATE POLICY "course_videos_service_all" ON public.course_videos
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
--- PURCHASES
+-- PURCHASES (service_role only — app uses admin client for all purchase operations)
 ALTER TABLE public.purchases ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "purchases_select_own" ON public.purchases
-  FOR SELECT TO authenticated
-  USING (auth.uid() = user_id);
 
 CREATE POLICY "purchases_service_all" ON public.purchases
   FOR ALL TO service_role USING (true) WITH CHECK (true);
@@ -201,12 +190,6 @@ CREATE POLICY "contact_messages_service_all" ON public.contact_messages
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- ============================================================================
--- SET ADMIN USER (run this after the admin signs up)
--- Replace the email below with the actual admin email
--- ============================================================================
--- UPDATE public.profiles SET role = 'admin' WHERE email = 'admin@example.com';
-
--- ============================================================================
 -- STORAGE: Course Thumbnails Bucket
 -- ============================================================================
 
@@ -214,12 +197,10 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('course-thumbnails', 'course-thumbnails', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Public read access
 CREATE POLICY "course_thumbnails_public_read" ON storage.objects
   FOR SELECT TO anon, authenticated
   USING (bucket_id = 'course-thumbnails');
 
--- Write access via service_role only (admin API routes use service_role)
 CREATE POLICY "course_thumbnails_service_write" ON storage.objects
   FOR INSERT TO service_role
   WITH CHECK (bucket_id = 'course-thumbnails');
@@ -231,3 +212,9 @@ CREATE POLICY "course_thumbnails_service_update" ON storage.objects
 CREATE POLICY "course_thumbnails_service_delete" ON storage.objects
   FOR DELETE TO service_role
   USING (bucket_id = 'course-thumbnails');
+
+-- ============================================================================
+-- AFTER SETUP: promote your account to admin
+-- Run this after logging in for the first time on the new project:
+-- UPDATE public.profiles SET role = 'admin' WHERE email = 'your@email.com';
+-- ============================================================================

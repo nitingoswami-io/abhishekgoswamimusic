@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { Lock, PlayCircle, Clock } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/types/database';
 import Badge from '@/components/ui/Badge';
@@ -27,7 +27,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
 
   const { data: course } = await getSupabaseAdmin()
     .from('courses')
@@ -44,19 +43,19 @@ export default async function CourseDetailPage({ params }: Props) {
     .eq('course_id', course.id)
     .order('sort_order');
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Check purchase via access token cookie (no auth required)
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(`purchase_access_${course.id}`)?.value;
 
   let hasPurchased = false;
-  if (user) {
+  if (accessToken) {
     const { data: purchase } = await getSupabaseAdmin()
       .from('purchases')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('access_token', accessToken)
       .eq('course_id', course.id)
       .eq('status', 'completed')
-      .single();
+      .maybeSingle();
     hasPurchased = !!purchase;
   }
 
@@ -152,20 +151,13 @@ export default async function CourseDetailPage({ params }: Props) {
                 <PlayCircle className="w-4 h-4" />
                 Continue Watching
               </Link>
-            ) : user ? (
+            ) : (
               <BuyButton
                 courseId={course.id}
                 courseTitle={course.title}
                 price={course.price}
                 slug={course.slug}
               />
-            ) : (
-              <Link
-                href={`/login?redirect=/courses/${course.slug}`}
-                className="flex items-center justify-center w-full px-5 py-2.5 bg-primary text-background text-sm font-medium rounded hover:bg-primary-hover transition-colors"
-              >
-                Login to Buy
-              </Link>
             )}
 
             <div className="mt-6 pt-6 border-t border-border space-y-3">

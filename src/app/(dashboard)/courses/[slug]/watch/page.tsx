@@ -1,5 +1,5 @@
 import { redirect, notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { cookies } from 'next/headers';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import CoursePlayer from '@/components/player/CoursePlayer';
 import type { CourseVideo } from '@/types/database';
@@ -20,13 +20,6 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function WatchCoursePage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
-
-  // Verify user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?redirect=/courses/${slug}/watch`);
 
   // Fetch course
   const { data: course } = await getSupabaseAdmin()
@@ -37,18 +30,27 @@ export default async function WatchCoursePage({ params }: Props) {
 
   if (!course) notFound();
 
-  // Verify purchase
+  // Verify purchase via access token cookie
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(`purchase_access_${course.id}`)?.value;
+
+  if (!accessToken) {
+    redirect(`/courses/${slug}`);
+  }
+
   const { data: purchase } = await getSupabaseAdmin()
     .from('purchases')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('access_token', accessToken)
     .eq('course_id', course.id)
     .eq('status', 'completed')
-    .single();
+    .maybeSingle();
 
-  if (!purchase) redirect(`/courses/${slug}`);
+  if (!purchase) {
+    redirect(`/courses/${slug}`);
+  }
 
-  // Fetch all videos (with URLs — user has paid)
+  // Fetch all videos (user has a valid purchase)
   const { data: videos } = await getSupabaseAdmin()
     .from('course_videos')
     .select('*')
