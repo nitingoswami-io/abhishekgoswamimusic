@@ -66,22 +66,22 @@ export default function Navbar() {
   if (pathname.startsWith('/admin')) return null;
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-sm border-b border-border">
+    <nav className="sticky top-0 z-50 bg-navbar-bg border-b border-navbar-border">
       <div className="max-w-5xl mx-auto px-6 sm:px-8">
-        <div className="flex items-center justify-between h-14">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="text-sm font-semibold tracking-tight text-text">
+          <Link href="/" className="font-display text-lg sm:text-xl font-bold tracking-tight text-navbar-text">
             {SITE_NAME}
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1.5">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 text-xs tracking-wide transition-colors ${
-                  pathname === link.href ? 'text-primary' : 'text-text-muted hover:text-text'
+                className={`px-3 py-1.5 text-sm tracking-wide transition-colors ${
+                  pathname === link.href ? 'text-navbar-text font-semibold' : 'text-navbar-text-muted hover:text-navbar-text'
                 }`}
               >
                 {link.label}
@@ -92,17 +92,17 @@ export default function Navbar() {
 
             {user && isAdmin && (
               <>
-                <span className="w-px h-4 bg-border mx-2" />
+                <span className="w-px h-4 bg-navbar-border mx-2" />
                 <Link
                   href="/admin"
-                  className="px-3 py-1.5 text-xs text-text-muted hover:text-text transition-colors"
+                  className="px-3 py-1.5 text-xs text-navbar-text-muted hover:text-navbar-text transition-colors"
                 >
                   <LayoutDashboard className="w-3.5 h-3.5 inline mr-1" />
                   Admin
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-text-dim hover:text-text transition-colors"
+                  className="p-2 text-navbar-text-muted hover:text-navbar-text transition-colors"
                   title="Logout"
                   aria-label="Logout"
                 >
@@ -115,7 +115,7 @@ export default function Navbar() {
           {/* Mobile hamburger — 44px touch target */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-3 -mr-2 text-text-muted hover:text-text"
+            className="md:hidden p-3 -mr-2 text-navbar-text-muted hover:text-navbar-text"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -125,27 +125,27 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="md:hidden border-t border-navbar-border bg-navbar-bg">
           <div className="px-6 py-4 space-y-1">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`block py-3 text-sm transition-colors ${
-                  pathname === link.href ? 'text-primary' : 'text-text-muted hover:text-text'
+                className={`block py-3 text-base transition-colors ${
+                  pathname === link.href ? 'text-navbar-text font-semibold' : 'text-navbar-text-muted hover:text-navbar-text'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="border-t border-border pt-3 mt-3">
+            <div className="border-t border-navbar-border pt-3 mt-3">
               {user && isAdmin ? (
                 <>
                   <Link
                     href="/admin"
                     onClick={() => setMobileOpen(false)}
-                    className="block py-3 text-sm text-text-muted hover:text-text"
+                    className="block py-3 text-sm text-navbar-text-muted hover:text-navbar-text"
                   >
                     Admin Panel
                   </Link>

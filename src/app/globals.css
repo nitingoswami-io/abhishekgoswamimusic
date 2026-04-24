@@ -16,6 +16,11 @@
   --color-text-muted: var(--fg2);
   --color-text-dim: var(--fg3);
 
+  --color-navbar-bg: var(--nav-bg);
+  --color-navbar-text: var(--nav-fg);
+  --color-navbar-text-muted: var(--nav-fg2);
+  --color-navbar-border: var(--nav-border);
+
   --color-danger: #dc2626;
   --color-success: #16a34a;
 
@@ -36,6 +41,12 @@
   --fg: #fdf4e7;
   --fg2: #a08060;
   --fg3: #6b5040;
+
+  /* Navbar — Warm Mahogany */
+  --nav-bg: #3a1808;
+  --nav-fg: #fdf4e7;
+  --nav-fg2: #d4a880;
+  --nav-border: #4d2210;
 }
 
 /* ── Vintage Vinyl — Light ── */
@@ -50,6 +61,12 @@
   --fg: #1c0a00;
   --fg2: #7a5030;
   --fg3: #a07050;
+
+  /* Navbar — Midnight Brass */
+  --nav-bg: #1c0a00;
+  --nav-fg: #f0d8b0;
+  --nav-fg2: #b89060;
+  --nav-border: #2e1808;
 }
 
 body {

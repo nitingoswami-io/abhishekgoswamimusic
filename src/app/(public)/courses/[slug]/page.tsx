@@ -81,12 +81,12 @@ export default async function CourseDetailPage({ params }: Props) {
           </div>
 
           <p className="label-mono mb-4">Course</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-text leading-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl font-bold text-text leading-tight mb-6">
             {course.title}
           </h1>
 
           {course.description && (
-            <p className="text-sm text-text-muted leading-relaxed mb-12 whitespace-pre-line max-w-xl">
+            <p className="text-base text-text-muted leading-relaxed mb-12 whitespace-pre-line max-w-xl">
               {course.description}
             </p>
           )}
@@ -96,7 +96,7 @@ export default async function CourseDetailPage({ params }: Props) {
             <div className="flex items-center gap-3 mb-6">
               <p className="label-mono">Curriculum</p>
               {videos && (
-                <span className="text-xs text-text-dim">
+                <span className="text-sm text-text-dim">
                   {videos.length} lessons
                 </span>
               )}
@@ -117,7 +117,7 @@ export default async function CourseDetailPage({ params }: Props) {
                     ) : (
                       <Lock className="w-4 h-4 text-text-dim flex-shrink-0" />
                     )}
-                    <span className="text-sm text-text flex-1">{video.title}</span>
+                    <span className="text-base text-text flex-1">{video.title}</span>
                     {video.is_preview && !hasPurchased && (
                       <Badge variant="default">Preview</Badge>
                     )}
@@ -139,14 +139,14 @@ export default async function CourseDetailPage({ params }: Props) {
         {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="sticky top-20 border border-border rounded-lg p-6">
-            <p className="text-2xl font-bold text-primary mb-6">
+            <p className="text-3xl font-bold text-primary mb-6">
               {course.price === 0 ? 'Free' : formatPrice(course.price)}
             </p>
 
             {hasPurchased ? (
               <Link
                 href={`/courses/${course.slug}/watch`}
-                className="flex items-center justify-center gap-2 w-full px-5 py-2.5 bg-primary text-background text-sm font-medium rounded hover:bg-primary-hover transition-colors"
+                className="flex items-center justify-center gap-2 w-full px-5 py-3 bg-primary text-background text-base font-semibold rounded-lg hover:bg-primary-hover transition-colors"
               >
                 <PlayCircle className="w-4 h-4" />
                 Continue Watching
@@ -161,12 +161,12 @@ export default async function CourseDetailPage({ params }: Props) {
             )}
 
             <div className="mt-6 pt-6 border-t border-border space-y-3">
-              <div className="flex items-center gap-2 text-xs text-text-muted">
-                <PlayCircle className="w-3.5 h-3.5 text-primary" />
+              <div className="flex items-center gap-2 text-sm text-text-muted">
+                <PlayCircle className="w-4 h-4 text-primary" />
                 {videos?.length ?? 0} video lessons
               </div>
-              <div className="flex items-center gap-2 text-xs text-text-muted">
-                <Clock className="w-3.5 h-3.5 text-primary" />
+              <div className="flex items-center gap-2 text-sm text-text-muted">
+                <Clock className="w-4 h-4 text-primary" />
                 Lifetime access
               </div>
             </div>
