@@ -5,6 +5,30 @@ import { createServerClient } from '@supabase/ssr';
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // ── CSRF: reject cross-origin state-mutating API requests ───────────────────
+  // Razorpay callback (`/api/razorpay/*`) and contact form (`/api/contact`) must
+  // originate from the same origin.  Browsers always send Origin on cross-origin
+  // POST requests; its absence (direct server-to-server) is allowed.
+  if (
+    request.method !== 'GET' &&
+    request.method !== 'HEAD' &&
+    request.nextUrl.pathname.startsWith('/api/')
+  ) {
+    const origin = request.headers.get('origin');
+    const host = request.headers.get('host');
+
+    if (origin && host) {
+      try {
+        const originHost = new URL(origin).host;
+        if (originHost !== host) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      } catch {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -53,5 +77,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/api/:path*'],
 };

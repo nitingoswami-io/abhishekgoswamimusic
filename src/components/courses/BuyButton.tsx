@@ -63,7 +63,6 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-              courseId,
             }),
           });
 

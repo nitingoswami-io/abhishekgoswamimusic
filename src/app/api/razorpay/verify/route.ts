@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, courseId } =
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       await request.json();
 
     // Verify signature
@@ -39,7 +39,8 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ success: true });
 
     // Set a per-course httpOnly cookie so the watch page can verify access without auth
-    response.cookies.set(`purchase_access_${courseId}`, purchase.access_token, {
+    // Use course_id from the DB record — never trust the client-supplied value
+    response.cookies.set(`purchase_access_${purchase.course_id}`, purchase.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 365, // 1 year
