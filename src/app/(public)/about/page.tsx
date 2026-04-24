@@ -30,6 +30,8 @@ const highlights = [
 const socials = [
   { name: 'YouTube', href: 'https://www.youtube.com/@AbhishekGoswamiMusic' },
   { name: 'Instagram', href: 'https://www.instagram.com/thisisabhishekgoswami/' },
+  { name: 'Threads', href: 'https://www.threads.com/@thisisabhishekgoswami' },
+  { name: 'Linktree', href: 'https://linktr.ee/thisisabhishekgoswami' },
 ];
 
 export default function AboutPage() {
@@ -82,10 +84,10 @@ export default function AboutPage() {
                   Email
                 </p>
                 <a
-                  href="mailto:contact@abhishekgoswami.com"
+                  href="mailto:abgo4u@gmail.com"
                   className="text-sm text-text hover:text-primary transition-colors"
                 >
-                  contact@abhishekgoswami.com
+                  abgo4u@gmail.com
                 </a>
               </div>
 

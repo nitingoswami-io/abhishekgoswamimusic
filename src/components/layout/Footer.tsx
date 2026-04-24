@@ -52,6 +52,26 @@ export default function Footer() {
                   Instagram ↗
                 </a>
               </li>
+              <li>
+                <a
+                  href="https://www.threads.com/@thisisabhishekgoswami"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-text-muted hover:text-text transition-colors"
+                >
+                  Threads ↗
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://linktr.ee/thisisabhishekgoswami"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-text-muted hover:text-text transition-colors"
+                >
+                  Linktree ↗
+                </a>
+              </li>
             </ul>
           </div>
         </div>
