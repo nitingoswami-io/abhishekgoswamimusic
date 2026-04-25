@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
+
+// Service-role client for profile lookups (bypasses RLS)
+let _adminClient: ReturnType<typeof createAdminClient> | null = null;
+function getAdmin() {
+  if (!_adminClient) {
+    _adminClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return _adminClient;
+}
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -59,17 +72,22 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
+      const redirect = NextResponse.redirect(new URL('/admin/login', request.url));
+      response.cookies.getAll().forEach((c) => redirect.cookies.set(c.name, c.value));
+      return redirect;
     }
 
-    const { data: profile } = await supabase
+    // Use service-role client to bypass RLS for the profile check
+    const { data: profile } = await getAdmin()
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .single<{ role: string }>();
 
     if (profile?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/', request.url));
+      const redirect = NextResponse.redirect(new URL('/', request.url));
+      response.cookies.getAll().forEach((c) => redirect.cookies.set(c.name, c.value));
+      return redirect;
     }
   }
 

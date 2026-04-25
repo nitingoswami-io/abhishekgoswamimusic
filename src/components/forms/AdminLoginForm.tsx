@@ -16,8 +16,16 @@ export default function AdminLoginForm() {
 
   // If already logged in as admin, go straight to admin panel
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) router.replace('/admin');
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      if (profile?.role === 'admin') {
+        router.replace('/admin');
+      }
     });
   }, []);
 
