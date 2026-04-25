@@ -3,44 +3,69 @@
 ## What This Site Offers
 
 ### For Visitors (Public)
-- **Home** — Landing page with artist intro, free lesson previews, and featured courses
-- **Free Lessons** — YouTube videos accessible without login or payment
-- **Courses** — Browse premium course catalog with descriptions, curriculum outlines, and pricing
-- **Contact** — Send a message directly to the admin
-- **Day/Night Theme** — Toggle between dark (smoky jazz) and light (clean white) modes
+- **Home** — Landing page showcasing all published courses in a grid
+- **About** — Artist bio, teaching approach, social links, and contact form
+- **Course Detail** — Each course page shows description, full curriculum outline with lesson durations, price, and preview videos
+- **Preview Videos** — Watch selected free preview lessons directly on the course page (no account needed)
+- **Day/Night Theme** — Toggle between dark (warm amber) and light modes
 
-### For Registered Users
-- **Sign Up / Login** — Email + password or Google OAuth
-- **Buy Courses** — Purchase via Razorpay (UPI, cards, netbanking)
-- **My Courses (Dashboard)** — View all purchased courses in one place
+### For Buyers (No Account Required)
+- **Guest Checkout** — Enter email + phone, pay via Razorpay (UPI, cards, netbanking) — no signup needed
 - **Course Player** — Watch sequential video lessons with a sidebar playlist
+- **Lifetime Access** — Purchase is stored permanently; access via browser cookie (1 year)
+- **Recover Access** — Lost your cookies? Enter your purchase email at `/recover-access` to get a magic link that restores access on any device/browser
 
 ### For Admin (Musician)
-- **Admin Panel** (`/admin`) — Manage the entire site
-- **Dashboard** — See total courses, students, revenue, and unread messages at a glance
+- **Admin Panel** (`/admin`) — Manage the entire site (protected by Supabase auth)
+- **Dashboard** — See total courses, students (by unique email), revenue, and unread messages at a glance
 - **Courses CRUD** — Create, edit, publish/unpublish, and delete courses
-- **Video Management** — Add YouTube unlisted URLs per course, set preview videos, reorder lessons
-- **Free Videos** — Add/remove public YouTube videos, toggle visibility
-- **Payments** — View all transactions (student, course, amount, status, Razorpay payment ID)
+- **Video Management** — Add YouTube unlisted URLs per course, set preview videos, reorder lessons, live preview before saving
+- **Payments** — View all transactions (buyer email, course, amount, status, Razorpay payment ID)
 - **Messages** — Read, mark as read/unread, and delete contact form submissions
+
+---
+
+## How the Purchase Flow Works
+
+### Step-by-step: What a buyer experiences
+
+```
+Visitor browses courses on the home page
+    ↓
+Clicks a course → sees description, curriculum, price, preview videos
+    ↓
+Clicks "Buy Now — ₹999"
+    ↓
+Guest Checkout modal opens → enters email + phone
+    ↓
+Clicks "Continue to Payment" → Razorpay checkout opens (UPI / Card / Netbanking)
+    ↓
+Payment completes → Razorpay signature verified on server
+    ↓
+httpOnly cookie set for this course → redirected to success page
+    ↓
+Clicks "Start Watching" → full course player with all lessons
+    ↓
+Can rewatch anytime — lifetime access (cookie valid for 1 year)
+```
+
+### Key design choice: No accounts
+
+Buyers do **not** need to create an account. They provide email + phone during checkout (for purchase records and support), pay, and immediately get access. Access is tied to an httpOnly browser cookie.
+
+**Trade-off:** If a buyer clears cookies, switches browsers, or uses a new device, they lose access. This is solved by the **Recover Access** flow (see below).
 
 ---
 
 ## How Content Protection Works
 
-### The Problem
-Premium course videos are YouTube unlisted links. Anyone with the link can watch them. So how do we prevent non-paying users from accessing them?
+Premium course videos are YouTube **unlisted** links. The site prevents non-paying users from accessing these links through **2 layers of protection**:
 
-### The Solution: 3-Layer Protection
+**Layer 1 — Cookie Validation**
+When someone visits `/courses/guitar-basics/watch`, the server component reads the `purchase_access_{courseId}` cookie from the browser. If the cookie is missing, the user is redirected to the course detail page (where they see the "Buy Now" button). They never reach the player.
 
-**Layer 1 — Route Middleware**
-When someone tries to visit `/courses/guitar-basics/watch`, the middleware runs first. If the user is not logged in, they are immediately redirected to the login page. They never reach the course player.
-
-**Layer 2 — Server-Side Purchase Verification**
-Even if a user is logged in, the course player page (a Server Component) checks the database for a completed purchase record matching this user + this course. If no valid purchase exists, they are redirected to the course detail page (where they see the "Buy Now" button). The YouTube URLs are only fetched from the database and rendered into the page HTML if the purchase check passes.
-
-**Layer 3 — Supabase Row Level Security (RLS)**
-At the database level itself, the `course_videos` table has RLS policies that only return `youtube_url` values to users who have a completed purchase for that course. Even if someone bypasses the application layer, the database refuses to return the sensitive data.
+**Layer 2 — Server-Side Database Verification**
+Even if a cookie exists, the server validates its value (`access_token` UUID) against the `purchases` table, checking that a completed purchase exists with that token for that course. Only if verification passes does the server fetch and render the YouTube URLs into the page. A guessed or forged cookie value will fail this check.
 
 ### What Razorpay Does
 
@@ -51,17 +76,16 @@ Razorpay handles the actual money transaction:
 3. After payment, Razorpay sends back a **payment ID + cryptographic signature**
 4. The server **verifies the signature** using HMAC-SHA256 with your secret key
 5. Only if the signature is valid → the purchase is marked as "completed" in the database
-6. The user can now access the course videos
+6. An httpOnly cookie is set → the user can now access the course videos
 
-**Key security point:** The signature verification (step 4) ensures that no one can fake a payment. Only Razorpay can produce a valid signature, and only your server has the secret key to verify it. A purchase record is only marked "completed" after this cryptographic check passes.
+**Key security point:** The signature verification (step 4) ensures that no one can fake a payment. Only Razorpay can produce a valid signature, and only your server has the secret key to verify it.
 
 ### What Users See
 
 | User State | Course Detail Page | Course Player |
 |---|---|---|
-| Not logged in | Sees curriculum (titles only, lock icons), "Login to Buy" button | Redirected to login |
-| Logged in, not purchased | Sees curriculum (lock icons), "Buy Now" button with price | Redirected to course detail |
-| Logged in, purchased | Sees curriculum (play icons), "Continue Watching" button | Full video player with all lessons |
+| No purchase cookie | Curriculum titles + lock icons, "Buy Now" button, preview videos | Redirected to course detail |
+| Valid purchase cookie | Curriculum + play icons, "Continue Watching" button | Full video player with all lessons |
 
 ### Limitations (MVP Trade-offs)
 
@@ -69,6 +93,24 @@ Razorpay handles the actual money transaction:
   - The URLs are only rendered for verified purchasers
   - YouTube unlisted is "security through obscurity" by design
   - For stronger protection in the future, consider Vimeo's domain-restricted embeds or a custom video player with token-based access
+
+---
+
+## How to Recover Access
+
+If a buyer clears their browser cookies, switches to a new browser, or uses a different device, they can restore access without contacting support:
+
+1. Visit `/recover-access` (or click "Already purchased? Recover access" on any course page)
+2. Enter the email used during purchase
+3. Receive a magic link via email (expires in 30 minutes)
+4. Click the link → all purchase cookies are restored on the current browser
+5. See the "Access Restored!" confirmation page
+
+**How it works under the hood:**
+- The server generates a signed HMAC token encoding `email + timestamp` (no database changes needed)
+- When the link is clicked, the server verifies the token's signature and checks it hasn't expired
+- It queries all completed purchases for that email and sets a `purchase_access_{courseId}` cookie for each one
+- The magic link is single-session — once the cookies are set, the buyer has access again
 
 ---
 
@@ -102,45 +144,23 @@ The site does not host any video files. All videos live on YouTube as **unlisted
 ### Step 3: Add Videos to the Course
 
 1. From the Courses list, click the **video icon** next to your course
-2. Click **Add Video** and fill in:
-   - **Title** — e.g., "Lesson 1 — Major 7th Voicings"
-   - **YouTube URL** — paste the unlisted URL you copied from YouTube
-   - **Duration** — optional, in minutes
-   - **Free Preview** — check this box if you want this lesson to be visible (title only) to non-paying visitors as a teaser. The actual video will NOT play for them — they only see that it exists
-3. Repeat for all lessons. Videos are numbered in the order you add them
-4. The first few videos of a course should ideally be marked as "Preview" to give potential buyers a sense of the curriculum
+2. Click **Add Video** — a form appears with a **live YouTube preview**
+3. Paste the YouTube URL — the video loads immediately so you can verify it's correct
+4. Fill in title, duration (optional), and check **Free Preview** if you want this lesson to be watchable for free as a teaser on the course page
+5. Repeat for all lessons. Videos are numbered in the order you add them
+6. The first few videos should ideally be marked as "Preview" to give potential buyers a taste
 
 ### Step 4: Publish the Course
 
 1. Go back to **Courses** → click the **edit icon** next to your course
 2. Check the **Published** checkbox
 3. Click **Update Course**
-4. The course now appears on the public site with the "Buy Now" button
+4. The course now appears on the home page with the "Buy Now" button
 
-### Step 5: What Happens When a Student Buys
-
-```
-Student visits /courses/jazz-chord-melody
-    ↓
-Sees course description, curriculum (titles + lock icons), price
-    ↓
-Clicks "Buy Now — ₹999"
-    ↓
-Razorpay checkout modal opens (UPI / Card / Netbanking)
-    ↓
-Student pays → Razorpay verifies → purchase marked "completed"
-    ↓
-Student redirected to /courses/jazz-chord-melody/watch
-    ↓
-Sees all lesson videos (YouTube unlisted embeds) in a player with sidebar
-    ↓
-Can rewatch anytime — lifetime access
-```
-
-### Step 6: Monitor Payments
+### Step 5: Monitor Payments
 
 - Go to `/admin` → **Payments** to see all transactions
-- Each row shows: date, student name/email, course, amount, status, and Razorpay payment ID
+- Each row shows: date, buyer email, course, amount, status, and Razorpay payment ID
 - You can cross-reference with your Razorpay dashboard for refunds or disputes
 
 ### Quick Reference: YouTube Upload Settings
@@ -158,7 +178,7 @@ Can rewatch anytime — lifetime access
 You can add new videos to an existing published course at any time:
 1. Upload the new lesson to YouTube (unlisted)
 2. Go to Admin → Courses → video icon → Add Video
-3. Students who already purchased will see the new lesson immediately
+3. Buyers who already purchased will see the new lesson immediately
 
 ### Updating or Replacing a Video
 
@@ -174,11 +194,16 @@ If you need to re-record a lesson:
 1. Create a **Supabase** project → copy URL + anon key + service role key
 2. Run `supabase-migration.sql` in Supabase SQL Editor
 3. Create a **Razorpay** account → copy test key ID + secret
-4. Update `.env.local` with all credentials
-5. Run `npm run dev` → open http://localhost:3000
-6. Register an account → set as admin in Supabase SQL:
+4. Set up a **Gmail App Password** for sending recovery emails (Google Account → Security → 2FA → App Passwords)
+5. Update `.env.local` with all credentials:
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+   - `GMAIL_USER`, `GMAIL_APP_PASSWORD`
+   - `NEXT_PUBLIC_APP_URL` (e.g., `http://localhost:3000` for dev)
+6. Run `npm run dev` → open http://localhost:3000
+7. Register an account → set as admin in Supabase SQL:
    ```sql
    UPDATE public.profiles SET role = 'admin' WHERE email = 'your@email.com';
    ```
-7. Go to `/admin` → start adding courses and videos
-8. For production: deploy to Vercel, switch Razorpay to live mode
+8. Go to `/admin` → start adding courses and videos
+9. For production: deploy to Vercel, switch Razorpay to live mode, update `NEXT_PUBLIC_APP_URL`
