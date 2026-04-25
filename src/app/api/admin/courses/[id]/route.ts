@@ -14,7 +14,14 @@ export async function PUT(request: Request, { params }: Context) {
 
     const { data, error } = await getSupabaseAdmin()
       .from('courses')
-      .update(body)
+      .update({
+        title: body.title,
+        slug: body.slug,
+        description: body.description,
+        price: body.price,
+        thumbnail_url: body.thumbnail_url,
+        is_published: body.is_published,
+      })
       .eq('id', id)
       .select()
       .single();

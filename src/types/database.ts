@@ -46,17 +46,6 @@ export interface Purchase {
   created_at: string;
 }
 
-export interface FreeVideo {
-  id: string;
-  title: string;
-  youtube_url: string;
-  description: string | null;
-  thumbnail_url: string | null;
-  sort_order: number;
-  is_published: boolean;
-  created_at: string;
-}
-
 export interface ContactMessage {
   id: string;
   name: string;

@@ -5,11 +5,15 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin';
 export async function PUT(request: Request) {
   try {
     await requireAdmin();
-    const { id, ...body } = await request.json();
+    const { id, is_read } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'Message ID is required' }, { status: 400 });
+    }
 
     const { error } = await getSupabaseAdmin()
       .from('contact_messages')
-      .update(body)
+      .update({ is_read: !!is_read })
       .eq('id', id);
 
     if (error) throw error;

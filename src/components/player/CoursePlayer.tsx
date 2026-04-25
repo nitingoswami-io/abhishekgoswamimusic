@@ -28,14 +28,20 @@ export default function CoursePlayer({ videos }: Props) {
       {/* Video player */}
       <div className="lg:col-span-2">
         <div className="aspect-video bg-black rounded-lg overflow-hidden border border-border">
-          <iframe
-            key={activeVideo.id}
-            src={`https://www.youtube-nocookie.com/embed/${ytId}`}
-            title={activeVideo.title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            className="w-full h-full"
-          />
+          {ytId ? (
+            <iframe
+              key={activeVideo.id}
+              src={`https://www.youtube-nocookie.com/embed/${ytId}`}
+              title={activeVideo.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-text-dim">
+              <p className="text-sm">Invalid video URL</p>
+            </div>
+          )}
         </div>
         <div className="mt-4">
           <h2 className="text-lg font-semibold text-text">{activeVideo.title}</h2>

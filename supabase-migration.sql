@@ -85,18 +85,6 @@ CREATE INDEX idx_purchases_status ON public.purchases(status);
 CREATE INDEX idx_purchases_email ON public.purchases(email);
 CREATE INDEX idx_purchases_access_token ON public.purchases(access_token);
 
--- FREE VIDEOS TABLE
-CREATE TABLE public.free_videos (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  youtube_url TEXT NOT NULL,
-  description TEXT,
-  thumbnail_url TEXT,
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  is_published BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
 -- CONTACT MESSAGES TABLE
 CREATE TABLE public.contact_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -167,16 +155,6 @@ CREATE POLICY "course_videos_service_all" ON public.course_videos
 ALTER TABLE public.purchases ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "purchases_service_all" ON public.purchases
-  FOR ALL TO service_role USING (true) WITH CHECK (true);
-
--- FREE VIDEOS (public read)
-ALTER TABLE public.free_videos ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "free_videos_public_read" ON public.free_videos
-  FOR SELECT TO anon, authenticated
-  USING (is_published = true);
-
-CREATE POLICY "free_videos_service_all" ON public.free_videos
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- CONTACT MESSAGES (insert by anyone, read by admin via service role)

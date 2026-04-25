@@ -34,7 +34,14 @@ export async function POST(request: Request, { params }: Context) {
 
     const { data, error } = await getSupabaseAdmin()
       .from('course_videos')
-      .insert({ ...body, course_id: id })
+      .insert({
+        course_id: id,
+        title: body.title,
+        youtube_url: body.youtube_url,
+        sort_order: body.sort_order,
+        is_preview: body.is_preview,
+        duration_minutes: body.duration_minutes,
+      })
       .select()
       .single();
 
@@ -50,11 +57,11 @@ export async function POST(request: Request, { params }: Context) {
 export async function PUT(request: Request) {
   try {
     await requireAdmin();
-    const { videoId, ...body } = await request.json();
+    const { videoId, title, youtube_url, sort_order, is_preview, duration_minutes } = await request.json();
 
     const { data, error } = await getSupabaseAdmin()
       .from('course_videos')
-      .update(body)
+      .update({ title, youtube_url, sort_order, is_preview, duration_minutes })
       .eq('id', videoId)
       .select()
       .single();

@@ -43,6 +43,10 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
 
       setShowModal(false);
 
+      if (typeof window.Razorpay === 'undefined') {
+        throw new Error('Payment gateway is still loading. Please try again in a moment.');
+      }
+
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount,
@@ -56,21 +60,27 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
           razorpay_payment_id: string;
           razorpay_signature: string;
         }) {
-          const verifyRes = await fetch('/api/razorpay/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          });
+          try {
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
 
-          if (verifyRes.ok) {
-            toast.success('Payment successful!');
-            router.push(`/purchase/success?course=${slug}`);
-          } else {
-            toast.error('Payment verification failed. Contact support.');
+            if (verifyRes.ok) {
+              toast.success('Payment successful!');
+              // Small delay to ensure the access cookie from verify response is persisted
+              await new Promise((resolve) => setTimeout(resolve, 500));
+              router.push(`/purchase/success?course=${slug}`);
+            } else {
+              toast.error('Payment verification failed. Contact support.');
+            }
+          } catch {
+            toast.error('Payment verification failed. Please contact support if amount was deducted.');
           }
         },
         theme: {

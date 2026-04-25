@@ -25,7 +25,14 @@ export async function POST(request: Request) {
 
     const { data, error } = await getSupabaseAdmin()
       .from('courses')
-      .insert(body)
+      .insert({
+        title: body.title,
+        slug: body.slug,
+        description: body.description,
+        price: body.price,
+        thumbnail_url: body.thumbnail_url,
+        is_published: body.is_published,
+      })
       .select()
       .single();
 

@@ -203,9 +203,6 @@ async function main() {
   // Course videos depend on courses
   await migrateTable('course_videos');
 
-  // Free videos (standalone)
-  await migrateTable('free_videos');
-
   // Purchases — strip user_id (no auth users in new project yet)
   // access_token and email/phone are preserved for guest purchases
   await migrateTable('purchases', (row) => ({
