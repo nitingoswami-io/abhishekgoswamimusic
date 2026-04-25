@@ -15,7 +15,20 @@ export default function Footer() {
           <div>
             <p className="label-mono mb-3">Navigate</p>
             <ul className="space-y-1.5">
-              {[{ label: 'Home', href: '/' }, { label: 'About', href: '/about' }].map((item) => (
+              {[{ label: 'Home', href: '/' }, { label: 'About', href: '/about' }, { label: 'Contact', href: '/about#contact' }].map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="text-xs text-text-muted hover:text-text transition-colors"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p className="label-mono mb-3 mt-6">Legal</p>
+            <ul className="space-y-1.5">
+              {[{ label: 'Terms & Conditions', href: '/terms' }, { label: 'Privacy Policy', href: '/privacy' }, { label: 'Refund Policy', href: '/refund-policy' }].map((item) => (
                 <li key={item.label}>
                   <a
                     href={item.href}
