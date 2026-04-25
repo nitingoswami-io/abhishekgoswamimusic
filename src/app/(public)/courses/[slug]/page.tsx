@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
-import { Lock, PlayCircle, Clock } from 'lucide-react';
+import { Lock, PlayCircle, Clock, HelpCircle } from 'lucide-react';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice, getYouTubeId } from '@/types/database';
 import Badge from '@/components/ui/Badge';
@@ -191,6 +191,13 @@ export default async function CourseDetailPage({ params }: Props) {
                 <Clock className="w-4 h-4 text-primary" />
                 Lifetime access
               </div>
+              <Link
+                href="/about#contact"
+                className="flex items-center gap-2 text-sm text-text-muted hover:text-primary transition-colors"
+              >
+                <HelpCircle className="w-4 h-4 text-primary" />
+                Need help? Contact us
+              </Link>
             </div>
           </div>
         </div>

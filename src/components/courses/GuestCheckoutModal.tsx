@@ -102,7 +102,10 @@ export default function GuestCheckoutModal({ courseTitle, onConfirm, onClose, lo
         </form>
 
         <p className="mt-4 text-xs text-text-dim text-center">
-          Your details are used only for purchase records and support.
+          Your details are used only for purchase records.{' '}
+          <a href="/about#contact" className="text-primary hover:text-primary-hover">
+            Need help?
+          </a>
         </p>
       </div>
     </div>

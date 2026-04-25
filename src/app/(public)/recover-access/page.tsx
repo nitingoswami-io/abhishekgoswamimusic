@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import Link from 'next/link';
 import RecoverAccessForm from '@/components/forms/RecoverAccessForm';
 
 export const metadata: Metadata = {
@@ -22,6 +23,12 @@ export default function RecoverAccessPage() {
             <RecoverAccessForm />
           </Suspense>
         </div>
+        <p className="text-center mt-4 text-xs text-text-dim">
+          Having trouble?{' '}
+          <Link href="/about#contact" className="text-primary hover:text-primary-hover">
+            Contact us
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ export default function AboutPage() {
       </section>
 
       {/* Contact */}
-      <section className="border-t border-border pt-16">
+      <section id="contact" className="border-t border-border pt-16">
         <p className="label-mono mb-10">Get in Touch</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">

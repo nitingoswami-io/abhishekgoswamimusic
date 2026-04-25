@@ -22,6 +22,12 @@ export default function RecoverAccessSuccessPage() {
         >
           Browse Courses
         </Link>
+        <p className="mt-4 text-xs text-text-dim">
+          Need help?{' '}
+          <Link href="/about#contact" className="text-primary hover:text-primary-hover">
+            Contact us
+          </Link>
+        </p>
       </div>
     </div>
   );

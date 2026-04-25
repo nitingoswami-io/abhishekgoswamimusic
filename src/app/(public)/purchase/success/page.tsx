@@ -94,6 +94,13 @@ export default async function PurchaseSuccessPage({ searchParams }: Props) {
             Back to Home
           </Link>
         </div>
+
+        <p className="mt-6 text-xs text-text-dim">
+          Need help?{' '}
+          <Link href="/about#contact" className="text-primary hover:text-primary-hover">
+            Contact us
+          </Link>
+        </p>
       </div>
     </div>
   );
