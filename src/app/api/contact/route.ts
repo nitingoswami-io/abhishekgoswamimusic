@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to save message' }, { status: 500 });
     }
 
-    // Send email notification — fire and forget (DB is source of truth)
+    // Send email notification (awaited so serverless runtimes don't kill the process)
     if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -30,17 +30,17 @@ export async function POST(request: Request) {
         },
       });
 
-      transporter
-        .sendMail({
+      try {
+        await transporter.sendMail({
           from: process.env.GMAIL_USER,
           to: process.env.GMAIL_USER,
           subject: `New message from ${name}`,
           text: `From: ${name} <${email}>\n\n${message}`,
           replyTo: email,
-        })
-        .catch((err) => {
-          console.error('Failed to send contact email notification:', err);
         });
+      } catch (err) {
+        console.error('Failed to send contact email notification:', err);
+      }
     }
 
     return NextResponse.json({ success: true });
