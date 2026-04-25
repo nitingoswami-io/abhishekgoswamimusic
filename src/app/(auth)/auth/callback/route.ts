@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 
 // Allowlist of paths the auth callback may redirect to.
 // Never allow external URLs or arbitrary paths to prevent open-redirect attacks.
-const ALLOWED_REDIRECT_PATHS = ['/admin', '/admin/dashboard'];
+const ALLOWED_REDIRECT_PATHS = ['/admin', '/admin/dashboard', '/reset-password'];
 
 function safeRedirectPath(raw: string | null): string {
   if (!raw) return '/admin';

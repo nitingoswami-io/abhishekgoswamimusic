@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -122,6 +123,11 @@ export default function AdminLoginForm() {
         >
           {loading ? 'Signing in…' : 'Sign In'}
         </button>
+        <p className="text-right">
+          <Link href="/forgot-password" className="text-xs text-primary hover:text-primary-hover">
+            Forgot password?
+          </Link>
+        </p>
       </form>
 
       <div className="relative">
