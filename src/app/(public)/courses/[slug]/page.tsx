@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { Lock, PlayCircle, Clock } from 'lucide-react';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { formatPrice } from '@/types/database';
+import { formatPrice, getYouTubeId } from '@/types/database';
 import Badge from '@/components/ui/Badge';
 import BuyButton from '@/components/courses/BuyButton';
+import PreviewModal from '@/components/courses/PreviewModal';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -39,9 +40,15 @@ export default async function CourseDetailPage({ params }: Props) {
 
   const { data: videos } = await getSupabaseAdmin()
     .from('course_videos')
-    .select('id, title, sort_order, is_preview, duration_minutes')
+    .select('id, title, youtube_url, sort_order, is_preview, duration_minutes')
     .eq('course_id', course.id)
     .order('sort_order');
+
+  // Build preview videos list with YouTube IDs for the client modal
+  const previewVideos = (videos ?? [])
+    .filter((v) => v.is_preview)
+    .map((v) => ({ id: v.id, title: v.title, ytId: getYouTubeId(v.youtube_url) }))
+    .filter((v): v is { id: string; title: string; ytId: string } => v.ytId !== null);
 
   // Check purchase via access token cookie (no auth required)
   const cookieStore = await cookies();
@@ -133,6 +140,11 @@ export default async function CourseDetailPage({ params }: Props) {
             ) : (
               <p className="text-sm text-text-dim">Curriculum coming soon.</p>
             )}
+
+            {/* Preview video modal for non-purchasers */}
+            {!hasPurchased && previewVideos.length > 0 && (
+              <PreviewModal videos={previewVideos} />
+            )}
           </div>
         </div>
 
@@ -152,12 +164,22 @@ export default async function CourseDetailPage({ params }: Props) {
                 Continue Watching
               </Link>
             ) : (
-              <BuyButton
-                courseId={course.id}
-                courseTitle={course.title}
-                price={course.price}
-                slug={course.slug}
-              />
+              <>
+                <BuyButton
+                  courseId={course.id}
+                  courseTitle={course.title}
+                  price={course.price}
+                  slug={course.slug}
+                />
+                <p className="text-center mt-3">
+                  <Link
+                    href="/recover-access"
+                    className="text-xs text-text-dim hover:text-primary transition-colors"
+                  >
+                    Already purchased? Recover access
+                  </Link>
+                </p>
+              </>
             )}
 
             <div className="mt-6 pt-6 border-t border-border space-y-3">
