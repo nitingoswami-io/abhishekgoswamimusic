@@ -19,7 +19,7 @@ export async function PUT(request: Request) {
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Error';
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred';
     const status = message === 'Unauthorized' ? 401 : message === 'Forbidden' ? 403 : 500;
     return NextResponse.json({ error: message }, { status });
   }
@@ -34,7 +34,7 @@ export async function DELETE(request: Request) {
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Error';
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred';
     const status = message === 'Unauthorized' ? 401 : message === 'Forbidden' ? 403 : 500;
     return NextResponse.json({ error: message }, { status });
   }

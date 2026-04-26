@@ -7,26 +7,10 @@ export const metadata: Metadata = {
   title: 'Set New Password',
 };
 
-export default async function ResetPasswordPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ code?: string }>;
-}) {
-  const { code } = await searchParams;
+export default async function ResetPasswordPage() {
   const supabase = await createClient();
 
-  // Exchange the code from the email link for a session (server-side)
-  if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) {
-      // Code invalid/expired — send user back to request a new link
-      redirect('/forgot-password');
-    }
-    // Success — redirect to same page without code to prevent reuse
-    redirect('/reset-password');
-  }
-
-  // No code — verify user has a valid session (set by the exchange above)
+  // Verify user has a valid session (set by /auth/callback)
   const {
     data: { user },
   } = await supabase.auth.getUser();

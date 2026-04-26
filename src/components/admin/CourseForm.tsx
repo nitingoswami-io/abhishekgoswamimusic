@@ -76,9 +76,18 @@ export default function CourseForm({ course }: Props) {
       const title = formData.get('title') as string;
       const priceRupees = parseFloat(formData.get('price') as string);
 
+      if (isNaN(priceRupees) || priceRupees < 0) {
+        toast.error('Please enter a valid price.');
+        setLoading(false);
+        return;
+      }
+
+      const rawSlug = (formData.get('slug') as string) || title;
+      const slug = rawSlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
       const data = {
         title,
-        slug: (formData.get('slug') as string) || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        slug,
         description: formData.get('description') as string,
         price: Math.round(priceRupees * 100),
         thumbnail_url: thumbnailUrl,

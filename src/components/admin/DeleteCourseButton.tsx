@@ -39,6 +39,7 @@ export default function DeleteCourseButton({ courseId, courseTitle }: Props) {
       onClick={handleDelete}
       disabled={loading}
       title="Delete course"
+      aria-label={`Delete ${courseTitle}`}
       className="text-danger hover:text-danger"
     >
       <Trash2 className="w-4 h-4" />

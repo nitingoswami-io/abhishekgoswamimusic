@@ -41,7 +41,7 @@ export default async function AdminCoursesPage() {
             <tbody>
               {courses.map((course) => (
                 <tr key={course.id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 text-text font-medium">{course.title}</td>
+                  <td className="px-4 py-3 text-text font-medium truncate max-w-xs">{course.title}</td>
                   <td className="px-4 py-3 text-text-muted">{formatPrice(course.price)}</td>
                   <td className="px-4 py-3">
                     <Badge variant={course.is_published ? 'success' : 'warning'}>
@@ -51,12 +51,12 @@ export default async function AdminCoursesPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Link href={`/admin/courses/${course.id}/videos`}>
-                        <Button variant="ghost" size="sm" title="Manage videos">
+                        <Button variant="ghost" size="sm" title="Manage videos" aria-label={`Manage videos for ${course.title}`}>
                           <Video className="w-4 h-4" />
                         </Button>
                       </Link>
                       <Link href={`/admin/courses/${course.id}/edit`}>
-                        <Button variant="ghost" size="sm" title="Edit course">
+                        <Button variant="ghost" size="sm" title="Edit course" aria-label={`Edit ${course.title}`}>
                           <Pencil className="w-4 h-4" />
                         </Button>
                       </Link>

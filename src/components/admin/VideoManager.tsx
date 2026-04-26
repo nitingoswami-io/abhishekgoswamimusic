@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -25,13 +25,21 @@ export default function VideoManager({ courseId, initialVideos }: Props) {
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    const youtubeUrl = formData.get('youtube_url') as string;
+
+    if (!getYouTubeId(youtubeUrl)) {
+      toast.error('Invalid YouTube URL. Please enter a valid YouTube link.');
+      return;
+    }
+
+    setLoading(true);
+
     const data = {
       title: formData.get('title') as string,
-      youtube_url: formData.get('youtube_url') as string,
-      sort_order: videos.length,
+      youtube_url: youtubeUrl,
+      sort_order: Math.max(...videos.map((v) => v.sort_order), -1) + 1,
       is_preview: formData.get('is_preview') === 'on',
       duration_minutes: formData.get('duration')
         ? parseInt(formData.get('duration') as string)
@@ -98,7 +106,6 @@ export default function VideoManager({ courseId, initialVideos }: Props) {
               >
                 {/* Header row */}
                 <div className="flex items-center gap-3 px-4 py-3 bg-background">
-                  <GripVertical className="w-4 h-4 text-text-dim flex-shrink-0" />
                   <span className="text-xs font-mono text-text-dim w-6">
                     {String(index + 1).padStart(2, '0')}
                   </span>
@@ -125,6 +132,7 @@ export default function VideoManager({ courseId, initialVideos }: Props) {
                   </button>
                   <button
                     onClick={() => handleDelete(video.id)}
+                    aria-label={`Delete video: ${video.title}`}
                     className="p-1.5 text-text-dim hover:text-danger transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
