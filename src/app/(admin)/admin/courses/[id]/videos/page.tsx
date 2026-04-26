@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import VideoManager from '@/components/admin/VideoManager';
 
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Manage Videos' };
 
 interface Props {

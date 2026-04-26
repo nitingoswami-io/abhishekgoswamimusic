@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import CourseForm from '@/components/admin/CourseForm';
 
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Edit Course' };
 
 interface Props {

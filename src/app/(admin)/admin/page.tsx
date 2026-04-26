@@ -2,6 +2,7 @@ import { BookOpen, Users, CreditCard, MessageSquare } from 'lucide-react';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/types/database';
 
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Admin Dashboard' };
 
 export default async function AdminDashboardPage() {

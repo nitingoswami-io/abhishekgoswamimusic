@@ -6,6 +6,7 @@ import Badge from '@/components/ui/Badge';
 import DeleteCourseButton from '@/components/admin/DeleteCourseButton';
 import { Plus, Pencil, Video } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Manage Courses' };
 
 export default async function AdminCoursesPage() {

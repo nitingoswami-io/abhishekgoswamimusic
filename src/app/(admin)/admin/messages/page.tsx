@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import MessageList from '@/components/admin/MessageList';
 
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Messages' };
 
 export default async function AdminMessagesPage() {

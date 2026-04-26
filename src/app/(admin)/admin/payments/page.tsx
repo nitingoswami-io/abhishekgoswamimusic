@@ -2,6 +2,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { formatPrice } from '@/types/database';
 import Badge from '@/components/ui/Badge';
 
+export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Payments' };
 
 export default async function AdminPaymentsPage() {
