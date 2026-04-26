@@ -95,8 +95,7 @@ export default function TermsPage() {
           <div className="mt-3 p-4 border border-border rounded-lg">
             <p className="text-text font-medium">Abhishek Goswami</p>
             <p>Email: <a href="mailto:abgo4u@gmail.com" className="text-primary hover:text-primary-hover">abgo4u@gmail.com</a></p>
-            <p>Phone: <a href="tel:+917742644998" className="text-primary hover:text-primary-hover">+91-7742644998</a></p>
-            <p>Address: Jaipur, Rajasthan, India</p>
+       
           </div>
         </section>
 
