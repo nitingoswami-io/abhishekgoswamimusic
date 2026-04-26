@@ -126,7 +126,7 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full px-5 py-2.5 bg-primary text-background text-sm font-medium rounded hover:bg-primary-hover transition-colors disabled:opacity-40"
+          className="w-full px-5 py-3 bg-primary text-background text-sm font-medium rounded hover:bg-primary-hover transition-colors disabled:opacity-40"
         >
           {loading ? 'Creating account...' : 'Create Account'}
         </button>
@@ -152,7 +152,7 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={magicLinkLoading}
-          className="w-full px-5 py-2.5 border border-border text-text text-sm rounded hover:border-primary transition-colors flex items-center justify-center disabled:opacity-40"
+          className="w-full px-5 py-3 border border-border text-text text-sm rounded hover:border-primary transition-colors flex items-center justify-center disabled:opacity-40"
         >
           <Mail className="w-4 h-4 mr-2" />
           {magicLinkLoading ? 'Sending...' : 'Send me a magic link'}

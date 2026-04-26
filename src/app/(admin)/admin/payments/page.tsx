@@ -17,7 +17,7 @@ export default async function AdminPaymentsPage() {
 
       {purchases && purchases.length > 0 ? (
         <div className="bg-surface rounded-xl border border-border overflow-hidden overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[640px]">
             <thead>
               <tr className="border-b border-border bg-surface-light">
                 <th className="text-left px-4 py-3 text-text-muted font-medium">Date</th>

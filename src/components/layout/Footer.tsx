@@ -14,12 +14,12 @@ export default function Footer() {
           {/* Links */}
           <div>
             <p className="label-mono mb-3">Navigate</p>
-            <ul className="space-y-1.5">
+            <ul className="space-y-0.5">
               {[{ label: 'Home', href: '/' }, { label: 'About', href: '/about' }, { label: 'Contact', href: '/about#contact' }].map((item) => (
                 <li key={item.label}>
                   <a
                     href={item.href}
-                    className="text-xs text-text-muted hover:text-text transition-colors"
+                    className="inline-block py-1.5 text-sm text-text-muted hover:text-text transition-colors"
                   >
                     {item.label}
                   </a>
@@ -27,12 +27,12 @@ export default function Footer() {
               ))}
             </ul>
             <p className="label-mono mb-3 mt-6">Legal</p>
-            <ul className="space-y-1.5">
+            <ul className="space-y-0.5">
               {[{ label: 'Terms & Conditions', href: '/terms' }, { label: 'Privacy Policy', href: '/privacy' }, { label: 'Refund Policy', href: '/refund-policy' }].map((item) => (
                 <li key={item.label}>
                   <a
                     href={item.href}
-                    className="text-xs text-text-muted hover:text-text transition-colors"
+                    className="inline-block py-1.5 text-sm text-text-muted hover:text-text transition-colors"
                   >
                     {item.label}
                   </a>
@@ -44,13 +44,13 @@ export default function Footer() {
           {/* Social */}
           <div>
             <p className="label-mono mb-3">Connect</p>
-            <ul className="space-y-1.5">
+            <ul className="space-y-0.5">
               <li>
                 <a
                   href="https://www.youtube.com/@AbhishekGoswamiMusic"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-text-muted hover:text-text transition-colors"
+                  className="inline-block py-1.5 text-sm text-text-muted hover:text-text transition-colors"
                 >
                   YouTube ↗
                 </a>
@@ -60,7 +60,7 @@ export default function Footer() {
                   href="https://www.instagram.com/thisisabhishekgoswami/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-text-muted hover:text-text transition-colors"
+                  className="inline-block py-1.5 text-sm text-text-muted hover:text-text transition-colors"
                 >
                   Instagram ↗
                 </a>
@@ -70,7 +70,7 @@ export default function Footer() {
                   href="https://www.threads.com/@thisisabhishekgoswami"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-text-muted hover:text-text transition-colors"
+                  className="inline-block py-1.5 text-sm text-text-muted hover:text-text transition-colors"
                 >
                   Threads ↗
                 </a>
@@ -80,7 +80,7 @@ export default function Footer() {
                   href="https://linktr.ee/thisisabhishekgoswami"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-text-muted hover:text-text transition-colors"
+                  className="inline-block py-1.5 text-sm text-text-muted hover:text-text transition-colors"
                 >
                   Linktree ↗
                 </a>

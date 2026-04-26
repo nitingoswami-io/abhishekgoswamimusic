@@ -178,7 +178,7 @@ export default function CourseForm({ course }: Props) {
               alt="Thumbnail preview"
               width={320}
               height={180}
-              className="rounded-lg border border-border object-cover"
+              className="rounded-lg border border-border object-cover max-w-full h-auto"
             />
             <button
               type="button"

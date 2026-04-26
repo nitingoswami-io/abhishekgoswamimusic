@@ -28,8 +28,8 @@ export default async function AdminCoursesPage() {
       </div>
 
       {courses && courses.length > 0 ? (
-        <div className="bg-surface rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="bg-surface rounded-xl border border-border overflow-hidden overflow-x-auto">
+          <table className="w-full text-sm min-w-[480px]">
             <thead>
               <tr className="border-b border-border bg-surface-light">
                 <th className="text-left px-4 py-3 text-text-muted font-medium">Title</th>

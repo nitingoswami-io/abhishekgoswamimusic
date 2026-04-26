@@ -108,7 +108,7 @@ export default function AdminSidebar() {
         <button
           onClick={() => setOpen(false)}
           aria-label="Close menu"
-          className="absolute top-3 right-3 p-1 text-text-muted hover:text-text"
+          className="absolute top-3 right-3 p-2 text-text-muted hover:text-text"
         >
           <X className="w-4 h-4" />
         </button>

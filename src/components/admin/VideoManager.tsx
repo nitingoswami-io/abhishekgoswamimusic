@@ -197,7 +197,7 @@ export default function VideoManager({ courseId, initialVideos }: Props) {
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               id="duration"
               name="duration"
