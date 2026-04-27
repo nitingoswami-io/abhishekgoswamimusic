@@ -6,7 +6,7 @@ const TOKEN_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
 const HMAC_PREFIX = 'recover-access:';
 
 export async function GET(request: Request) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = new URL(request.url).origin;
 
   try {
     const { searchParams } = new URL(request.url);

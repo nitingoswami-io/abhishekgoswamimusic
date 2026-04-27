@@ -41,8 +41,8 @@ export async function POST(request: Request) {
       .digest('hex');
     const token = `${payloadB64}.${signature}`;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const recoveryLink = `${appUrl}/api/recover-access/verify?token=${token}`;
+    const origin = new URL(request.url).origin;
+    const recoveryLink = `${origin}/api/recover-access/verify?token=${token}`;
 
     // Send recovery email (awaited for serverless reliability)
     if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
