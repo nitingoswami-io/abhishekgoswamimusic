@@ -17,7 +17,7 @@ export default function RecoverAccessSuccessPage() {
           Your purchased courses are now accessible on this device.
         </p>
         <Link
-          href="/courses"
+          href="/"
           className="inline-block px-5 py-2.5 bg-primary text-background text-sm font-medium rounded hover:bg-primary-hover transition-colors"
         >
           Browse Courses

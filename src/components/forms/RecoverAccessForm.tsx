@@ -68,7 +68,7 @@ export default function RecoverAccessForm() {
           We sent a recovery link. Click it to restore access on this device.
         </p>
         <Link
-          href="/courses"
+          href="/"
           className="text-xs text-primary hover:text-primary-hover"
         >
           Browse courses
@@ -100,7 +100,7 @@ export default function RecoverAccessForm() {
 
       <p className="text-center text-xs text-text-dim">
         Don&apos;t have a course?{' '}
-        <Link href="/courses" className="text-primary hover:text-primary-hover">
+        <Link href="/" className="text-primary hover:text-primary-hover">
           Browse courses
         </Link>
       </p>
