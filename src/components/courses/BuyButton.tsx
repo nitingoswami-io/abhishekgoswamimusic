@@ -84,7 +84,7 @@ export default function BuyButton({ courseId, courseTitle, price, slug }: Props)
           }
         },
         theme: {
-          color: '#d4a843',
+          color: '#5e8aff',
         },
       };
 

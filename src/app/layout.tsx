@@ -30,7 +30,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
-  themeColor: '#110a00',
+  themeColor: '#050610',
 };
 
 export const metadata: Metadata = {
@@ -54,9 +54,9 @@ export default function RootLayout({
           position="top-center"
           toastOptions={{
             style: {
-              background: '#1c1100',
-              color: '#fdf4e7',
-              border: '1px solid #3d2a0f',
+              background: '#0a0c1c',
+              color: '#c8cade',
+              border: '1px solid #1a1e40',
               fontSize: '0.875rem',
               fontFamily: 'var(--font-nunito)',
             },

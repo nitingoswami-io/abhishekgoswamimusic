@@ -65,7 +65,7 @@ export async function POST(request: Request) {
               <h2 style="margin-bottom: 16px;">Recover Your Course Access</h2>
               <p>Click the button below to restore access to your purchased courses on this device:</p>
               <p style="margin: 24px 0;">
-                <a href="${recoveryLink}" style="display: inline-block; padding: 12px 24px; background-color: #ff6b35; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">
+                <a href="${recoveryLink}" style="display: inline-block; padding: 12px 24px; background-color: #5e8aff; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">
                   Restore Access
                 </a>
               </p>

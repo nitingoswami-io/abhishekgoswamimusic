@@ -15,7 +15,7 @@ function getAdmin() {
   return _adminClient;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   // ── CSRF: reject cross-origin state-mutating API requests ───────────────────

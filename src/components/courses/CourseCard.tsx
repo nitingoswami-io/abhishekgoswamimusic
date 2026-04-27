@@ -13,7 +13,7 @@ export default function CourseCard({ course, purchased }: Props) {
   return (
     <Link href={href} className="group block">
       {/* Thumbnail */}
-      <div className="aspect-video bg-surface rounded-xl overflow-hidden border border-border group-hover:border-primary/50 group-hover:shadow-[0_0_20px_rgba(255,107,53,0.15)] transition-all duration-300 relative">
+      <div className="aspect-video bg-surface rounded-xl overflow-hidden border border-border group-hover:border-primary/50 group-hover:shadow-[0_0_20px_rgba(94,138,255,0.15)] transition-all duration-300 relative">
         {course.thumbnail_url ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img

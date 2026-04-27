@@ -29,44 +29,44 @@
   --font-display: var(--font-fraunces);
 }
 
-/* ── Vintage Vinyl — Dark (default) ── */
+/* ── Neon Jazz — Dark (smoky club, neon sign glow) ── */
 :root {
-  --bg: #110a00;
-  --bg2: #1c1100;
-  --bg3: #261800;
-  --border: #2e1f08;
-  --border-hover: #3d2a0f;
-  --accent: #ff6b35;
-  --accent-hover: #ff8c5a;
-  --fg: #fdf4e7;
-  --fg2: #a08060;
-  --fg3: #6b5040;
+  --bg: #050610;
+  --bg2: #0a0c1c;
+  --bg3: #12152d;
+  --border: #1a1e40;
+  --border-hover: #2a3060;
+  --accent: #5e8aff;
+  --accent-hover: #82a4ff;
+  --fg: #c8cade;
+  --fg2: #606888;
+  --fg3: #424866;
 
-  /* Navbar — Warm Mahogany */
-  --nav-bg: #3a1808;
-  --nav-fg: #fdf4e7;
-  --nav-fg2: #d4a880;
-  --nav-border: #4d2210;
+  /* Navbar — Darkest corner of the club */
+  --nav-bg: #060814;
+  --nav-fg: #c8cade;
+  --nav-fg2: #606888;
+  --nav-border: #141838;
 }
 
-/* ── Vintage Vinyl — Light ── */
+/* ── Neon Jazz — Light (hazy blue afternoon) ── */
 :root.light {
-  --bg: #fff8ef;
-  --bg2: #fdefd8;
-  --bg3: #f5e0c0;
-  --border: #e8c99a;
-  --border-hover: #d4b080;
-  --accent: #d44a10;
-  --accent-hover: #b83d0d;
-  --fg: #1c0a00;
-  --fg2: #7a5030;
-  --fg3: #a07050;
+  --bg: #eceef6;
+  --bg2: #dde0ee;
+  --bg3: #ccd0e2;
+  --border: #a0a5c4;
+  --border-hover: #5e8aff;
+  --accent: #3458b8;
+  --accent-hover: #283f90;
+  --fg: #0c0e22;
+  --fg2: #404665;
+  --fg3: #5e6488;
 
-  /* Navbar — Midnight Brass */
-  --nav-bg: #1c0a00;
-  --nav-fg: #f0d8b0;
-  --nav-fg2: #b89060;
-  --nav-border: #2e1808;
+  /* Navbar — Deep stage blue */
+  --nav-bg: #0c0e22;
+  --nav-fg: #dde0ee;
+  --nav-fg2: #606888;
+  --nav-border: #141838;
 }
 
 body {
@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::selection {
-  background: rgba(255, 107, 53, 0.3);
+  background: rgba(94, 138, 255, 0.3);
 }
 
 ::-webkit-scrollbar {
@@ -102,7 +102,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .smoky-gradient {
-  background: radial-gradient(ellipse at 50% 0%, rgba(255, 107, 53, 0.1) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(94, 138, 255, 0.15) 0%, transparent 60%);
 }
 
 .label-mono {
