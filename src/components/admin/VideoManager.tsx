@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Pencil, ChevronDown, ChevronUp, Save, X } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -21,7 +21,59 @@ export default function VideoManager({ courseId, initialVideos }: Props) {
   const [newUrl, setNewUrl] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editUrl, setEditUrl] = useState('');
+  const [editDuration, setEditDuration] = useState('');
+  const [editPreview, setEditPreview] = useState(false);
   const router = useRouter();
+
+  const startEdit = (video: CourseVideo) => {
+    setEditingId(video.id);
+    setEditTitle(video.title);
+    setEditUrl(video.youtube_url);
+    setEditDuration(video.duration_minutes ? String(video.duration_minutes) : '');
+    setEditPreview(video.is_preview);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+  };
+
+  const handleEdit = async (video: CourseVideo) => {
+    if (!getYouTubeId(editUrl)) {
+      toast.error('Invalid YouTube URL.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/courses/${courseId}/videos`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          videoId: video.id,
+          title: editTitle,
+          youtube_url: editUrl,
+          sort_order: video.sort_order,
+          is_preview: editPreview,
+          duration_minutes: editDuration ? parseInt(editDuration) : null,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update video');
+
+      const updated = await res.json();
+      setVideos(videos.map((v) => (v.id === video.id ? updated : v)));
+      setEditingId(null);
+      toast.success('Video updated!');
+      router.refresh();
+    } catch {
+      toast.error('Failed to update video');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,68 +149,143 @@ export default function VideoManager({ courseId, initialVideos }: Props) {
         <div className="space-y-2">
           {videos.map((video, index) => {
             const isExpanded = expandedId === video.id;
-            const ytId = getYouTubeId(video.youtube_url);
+            const isEditing = editingId === video.id;
+            const ytId = getYouTubeId(isEditing ? editUrl : video.youtube_url);
 
             return (
               <div
                 key={video.id}
                 className="border border-border rounded-lg overflow-hidden"
               >
-                {/* Header row */}
-                <div className="flex items-center gap-3 px-4 py-3 bg-background">
-                  <span className="text-xs font-mono text-text-dim w-6">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <button
-                    onClick={() => setExpandedId(isExpanded ? null : video.id)}
-                    className="flex-1 min-w-0 text-left"
-                  >
-                    <p className="text-sm font-medium text-text truncate">{video.title}</p>
-                    <p className="text-xs text-text-dim truncate">{video.youtube_url}</p>
-                  </button>
-                  {video.is_preview && <Badge variant="default">Preview</Badge>}
-                  {video.duration_minutes && (
-                    <span className="text-xs text-text-dim">{video.duration_minutes}m</span>
-                  )}
-                  <button
-                    onClick={() => setExpandedId(isExpanded ? null : video.id)}
-                    className="text-text-dim hover:text-text transition-colors"
-                  >
-                    {isExpanded ? (
-                      <ChevronUp className="w-4 h-4" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(video.id)}
-                    aria-label={`Delete video: ${video.title}`}
-                    className="p-1.5 text-text-dim hover:text-danger transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                {isEditing ? (
+                  /* Edit mode */
+                  <div className="px-4 py-3 space-y-4 bg-background">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-mono text-text-dim w-6">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <h3 className="label-mono">Editing</h3>
+                    </div>
 
-                {/* Expanded preview */}
-                {isExpanded && (
-                  <div className="border-t border-border p-4 bg-surface">
-                    <div className="max-w-lg">
-                      <div className="aspect-video rounded-lg overflow-hidden border border-border">
-                        <iframe
-                          src={`https://www.youtube-nocookie.com/embed/${ytId}`}
-                          title={video.title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="w-full h-full"
-                        />
+                    <YouTubePreview url={editUrl} />
+
+                    <Input
+                      id={`edit-title-${video.id}`}
+                      label="Video Title"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      required
+                    />
+                    <Input
+                      id={`edit-url-${video.id}`}
+                      label="YouTube URL"
+                      value={editUrl}
+                      onChange={(e) => setEditUrl(e.target.value)}
+                      required
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Input
+                        id={`edit-duration-${video.id}`}
+                        type="number"
+                        label="Duration (minutes)"
+                        value={editDuration}
+                        onChange={(e) => setEditDuration(e.target.value)}
+                        min="1"
+                      />
+                      <div className="flex items-end pb-1">
+                        <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editPreview}
+                            onChange={(e) => setEditPreview(e.target.checked)}
+                            className="w-4 h-4 rounded border-border bg-surface text-primary"
+                          />
+                          Free preview
+                        </label>
                       </div>
-                      <p className="text-xs text-text-dim mt-3">
-                        {video.is_preview
-                          ? 'Marked as preview — title visible to all, video plays only for purchasers.'
-                          : 'Locked — only visible to users who purchased this course.'}
-                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        disabled={loading}
+                        onClick={() => handleEdit(video)}
+                      >
+                        <Save className="w-3.5 h-3.5 mr-1.5" />
+                        {loading ? 'Saving...' : 'Save'}
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={cancelEdit}>
+                        <X className="w-3.5 h-3.5 mr-1.5" />
+                        Cancel
+                      </Button>
                     </div>
                   </div>
+                ) : (
+                  <>
+                    {/* Header row */}
+                    <div className="flex items-center gap-3 px-4 py-3 bg-background">
+                      <span className="text-xs font-mono text-text-dim w-6">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : video.id)}
+                        className="flex-1 min-w-0 text-left"
+                      >
+                        <p className="text-sm font-medium text-text truncate">{video.title}</p>
+                        <p className="text-xs text-text-dim truncate">{video.youtube_url}</p>
+                      </button>
+                      {video.is_preview && <Badge variant="default">Preview</Badge>}
+                      {video.duration_minutes && (
+                        <span className="text-xs text-text-dim">{video.duration_minutes}m</span>
+                      )}
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : video.id)}
+                        className="text-text-dim hover:text-text transition-colors"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => startEdit(video)}
+                        aria-label={`Edit video: ${video.title}`}
+                        className="p-1.5 text-text-dim hover:text-primary transition-colors"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(video.id)}
+                        aria-label={`Delete video: ${video.title}`}
+                        className="p-1.5 text-text-dim hover:text-danger transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Expanded preview */}
+                    {isExpanded && (
+                      <div className="border-t border-border p-4 bg-surface">
+                        <div className="max-w-lg">
+                          <div className="aspect-video rounded-lg overflow-hidden border border-border">
+                            <iframe
+                              src={`https://www.youtube-nocookie.com/embed/${ytId}`}
+                              title={video.title}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full h-full"
+                            />
+                          </div>
+                          <p className="text-xs text-text-dim mt-3">
+                            {video.is_preview
+                              ? 'Marked as preview — title visible to all, video plays only for purchasers.'
+                              : 'Locked — only visible to users who purchased this course.'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             );
